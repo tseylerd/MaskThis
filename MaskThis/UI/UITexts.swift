@@ -40,7 +40,7 @@ nonisolated struct UITexts {
             static let lastError = "Last error"
             static let installationFailed = "Model installation failed"
             
-            static let tooBigText = "The text is too big to be analyzed."
+            static let tooBigText = "The text is too big to be masked."
         }
         
         struct ModelState {
