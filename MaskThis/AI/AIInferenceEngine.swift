@@ -4,6 +4,7 @@ import Foundation
 @MainActor
 class AIInferenceEngine {
     private static let MAX_TOKENS = 512
+    private static let MAX_LENGTH = Util.tokensToSymbols(2048)
     
     private static let PROMPTS = Util.loadPrompts()
     
@@ -14,6 +15,10 @@ class AIInferenceEngine {
     }
     
     func mask(_ text: String) async throws -> String {
+        guard text.count < Self.MAX_LENGTH else {
+            throw InferenceError.textIsTooBig
+        }
+        
         let maxSymbols = Util.tokensToSymbols(Self.MAX_TOKENS)
         
         var result = ""
