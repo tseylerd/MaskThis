@@ -1,10 +1,14 @@
 import Testing
 import OSLog
+import Foundation
+import FoundationModels
+
 @testable import MaskThis
 
 @Suite("MaskingTest", .serialized)
 struct MaskingTest {
     private static let LOG = Logger(subsystem: Subsystems.TEST, category: "MaskingTest")
+    private static let MODEL = SystemLanguageModel(adapter: try! .init(fileURL: Bundle.main.url(forResource: "mask_adapter", withExtension: "fmadapter")!))
     
     @Test
     func simpleNoPII() async throws {
@@ -99,7 +103,8 @@ Thanks.
     }
     
     private func process(_ text: String) async throws -> String {
-        return try await AI.mask(text)
+        let engine = await AIInferenceEngine(Self.MODEL)
+        return try await engine.mask(text)
     }
     
     private func log(_ string: String) {
