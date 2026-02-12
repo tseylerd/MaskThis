@@ -53,7 +53,7 @@ class CustomNotificationManager {
             newWindow.animator().alphaValue = 1.0
         }
         
-        await Util.delay(.seconds(1.5))
+        await Util.delay(.seconds(3))
         
         guard newSessionId == sessionId else {
             return
