@@ -3,6 +3,8 @@ import Foundation
 
 @MainActor
 class AIInferenceEngine {
+    private static let MAX_TOKENS = 512
+    
     private static let PROMPTS = Util.loadPrompts()
     
     let model: SystemLanguageModel
@@ -12,8 +14,25 @@ class AIInferenceEngine {
     }
     
     func mask(_ text: String) async throws -> String {
-        let session = LanguageModelSession(model: model)
-        return try await session.respond(to: Util.embed(text: text, to: Self.PROMPTS.mask.user), generating: String.self).content
+        let maxSymbols = Util.tokensToSymbols(Self.MAX_TOKENS)
+        
+        var result = ""
+        let chunks = split(text, maxSymbols)
+        for chunk in chunks {
+            let session = LanguageModelSession(model: model)
+            result += try await session.respond(to: Util.embed(text: chunk, to: Self.PROMPTS.mask.user), generating: String.self).content
+        }
+        return result
+    }
+    
+    private func split(_ text: String, _ chunkSize: Int) -> [String] {
+        var result: [String] = []
+        for i in stride(from: 0, to: text.count, by: chunkSize) {
+            let startIndex = text.index(text.startIndex, offsetBy: i)
+            let endIndex = text.index(text.startIndex, offsetBy: min(i + chunkSize, text.count))
+            result.append(String(text[startIndex..<endIndex]))
+        }
+        return result
     }
 }
 

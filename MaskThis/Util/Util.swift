@@ -11,6 +11,10 @@ nonisolated struct Util {
         return Bundle.main.url(forResource: "mask_adapter", withExtension: "fmadapter")!
     }
     
+    static func tokensToSymbols(_ tokens: Int) -> Int {
+        return tokens * 3
+    }
+    
     static func loadPrompts() -> PromptsCollection {
         let bundleURL = Bundle.main.url(forResource: "prompts", withExtension: "bundle")!
        

@@ -81,7 +81,9 @@ class ClipboardManager {
             return
         }
         
-        let processedText = await self.processText(engine, toMask)
+        let processedText = await Task.detached(priority: .high) {
+            await self.processText(engine, toMask)
+        }.value
         
         guard let processedText else {
             Self.LOG.info("Processed text is nil")
