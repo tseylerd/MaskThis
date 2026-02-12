@@ -98,7 +98,7 @@ class ClipboardManager {
         
         currentChangeCount = NSPasteboard.general.changeCount
         
-        guard processedText != toMask else {
+        guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
             return
         }
