@@ -1,5 +1,6 @@
 import SwiftUI
 import OSLog
+import KeyboardShortcuts
 
 @MainActor
 @Observable
@@ -21,7 +22,7 @@ class ClipboardManager {
             return false
         }
         
-        guard let engine = self.aiMonitor.inference else {
+        guard let _ = self.aiMonitor.inference else {
             return false
         }
         
@@ -31,6 +32,12 @@ class ClipboardManager {
     init(_ appModel: AppModel, _ aiMonitor: AIMonitor) {
         self.model = appModel
         self.aiMonitor = aiMonitor
+        
+        KeyboardShortcuts.onKeyUp(for: .maskClipboardContent) {
+            Task(priority: .userInitiated) {
+                await self.maskClipboard()
+            }
+        }
     }
     
     func subscribeOnChanges() {
