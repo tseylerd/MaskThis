@@ -2,18 +2,36 @@ import SwiftUI
 import OSLog
 
 @MainActor
+@Observable
 class ClipboardManager {
     private static nonisolated let LOG = Logger(subsystem: Subsystems.CLIPBOARD, category: "ClipboardManager")
     
     private let model: AppModel
     private let aiMonitor: AIMonitor
     
+    @ObservationIgnored
+    private var currentChangeCount: Int = 0
+    
+    var canMask: Bool {
+        guard case .ready = self.model.appStatus else {
+            return false
+        }
+        
+        guard case .ready = self.model.aiStatus else {
+            return false
+        }
+        
+        guard let engine = self.aiMonitor.inference else {
+            return false
+        }
+        
+        return true
+    }
+    
     init(_ appModel: AppModel, _ aiMonitor: AIMonitor) {
         self.model = appModel
         self.aiMonitor = aiMonitor
     }
-    
-    private var currentChangeCount: Int = 0
     
     func subscribeOnChanges() {
         self.currentChangeCount = NSPasteboard.general.changeCount
@@ -25,28 +43,27 @@ class ClipboardManager {
                     await Util.delay(.seconds(1))
                     continue
                 }
-
-                guard case .ready = await self.model.appStatus else {
-                    Self.LOG.info("App is not ready")
-                    await Util.delay(.seconds(1))
-                    continue
-                }
                 
-                guard case .ready = await self.model.aiStatus else {
-                    Self.LOG.info("Model is not ready")
-                    await Util.delay(.seconds(1))
-                    continue
+                if let duration = await self.maskClipboard() {
+                    await Util.delay(duration)
                 }
-                
-                guard let engine = await self.aiMonitor.inference else {
-                    Self.LOG.info("Model adapter is not loaded")
-                    await Util.delay(.seconds(1))
-                    continue
-                }
-                
-                await self.processClipboard(engine)
             }
         }
+    }
+    
+    func maskClipboard() async -> Duration? {
+        guard canMask else {
+            Self.LOG.info("App is not ready")
+            return .seconds(1)
+        }
+        
+        guard let engine = self.aiMonitor.inference else {
+            Self.LOG.info("Model adapter is not loaded")
+            return .seconds(1)
+        }
+        
+        await self.processClipboard(engine)
+        return nil
     }
     
     private func processClipboard(_ engine: AIInferenceEngine) async {

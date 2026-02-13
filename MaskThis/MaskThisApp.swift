@@ -28,6 +28,7 @@ struct MaskThisApp: App {
                 .environment(appModel)
                 .environment(settingsModel)
                 .environment(scheme)
+                .environment(clipboardManager)
                 .onChange(of: settingsModel.showNotification) {
                     AppSettings.shared.showNotification = settingsModel.showNotification
                 } .onChange(of: settingsModel.auto) {

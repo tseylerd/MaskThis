@@ -15,6 +15,14 @@ class UIScheme {
         "hand.raised"
     }
     
+    var eyeDisabledImage: String {
+        "eye.slash.fill"
+    }
+    
+    var eyeEnabledImage: String {
+        "eye.fill"
+    }
+    
     var progressImage: String {
         "circle.dashed"
     }

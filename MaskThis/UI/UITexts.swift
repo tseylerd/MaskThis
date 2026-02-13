@@ -12,6 +12,7 @@ nonisolated struct UITexts {
         private init() { }
         
         static let quit = "Quit Mask This"
+        static let mask = "Mask Clipboard"
     }
     
     struct Toggles {
