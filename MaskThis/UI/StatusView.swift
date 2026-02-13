@@ -19,8 +19,6 @@ struct StatusView: View {
             } else {
                 DisabledView()
             }
-            
-            LastErrorView()
         }
     }
 }

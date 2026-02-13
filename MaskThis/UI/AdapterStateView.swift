@@ -20,14 +20,18 @@ struct AdapterStateView: View {
 }
 
 fileprivate struct PausedView: View {
+    @Environment(UIScheme.self) var scheme
+    
     var body: some View {
-        Text(UITexts.Statuses.ModelState.paused)
+        Label(UITexts.Statuses.ModelState.paused, systemImage: scheme.pauseImage)
     }
 }
 
 fileprivate struct PrepareView: View {
+    @Environment(UIScheme.self) var scheme
+    
     var body: some View {
-        Text(UITexts.Statuses.settingUp)
+        Label(UITexts.Statuses.settingUp, systemImage: scheme.progressImage)
     }
 }
 
@@ -38,8 +42,7 @@ fileprivate struct ModelAdapterErrorView: View {
     
     var body: some View {
         VStack {
-            Text(UITexts.Statuses.Errors.installationFailed)
-                .foregroundColor(scheme.errorTextColor)
+            Label(UITexts.Statuses.Errors.installationFailed, systemImage: scheme.errorImage)
             Text(error)
                 .foregroundColor(scheme.errorTextColor)
         }
@@ -52,6 +55,6 @@ fileprivate struct ModelAdapterPorgressView: View {
     let fraction: Double
     
     var body: some View {
-        Text(UITexts.Statuses.ModelState.progress(fraction))
+        Label(UITexts.Statuses.ModelState.progress(fraction), systemImage: scheme.progressImage)
     }
 }

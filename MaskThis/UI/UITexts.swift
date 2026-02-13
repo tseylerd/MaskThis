@@ -11,7 +11,7 @@ nonisolated struct UITexts {
     struct Actions {
         private init() { }
         
-        static let quit = "Quit"
+        static let quit = "Quit Mask This"
     }
     
     struct Toggles {

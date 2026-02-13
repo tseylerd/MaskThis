@@ -1,10 +1,9 @@
 import SwiftUI
 
 struct ProcessingStatusView: View {
+    @Environment(UIScheme.self) var scheme
+    
     var body: some View {
-        HStack {
-            ProgressView()
-            Text(UITexts.Statuses.progressStatus)
-        }
+        Label(UITexts.Statuses.progressStatus, systemImage: scheme.progressImage)
     }
 }
