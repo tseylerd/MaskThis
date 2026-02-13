@@ -6,14 +6,14 @@ struct MaskThisApp: App {
     private let clipboardManager: ClipboardManager
     private let aiMonitor: AIMonitor
     private let appModel: AppModel
-    private let modelManager: ModelManager
+    private let modelFactory: ModelFactory
     private let settingsModel: AppSettingsModel
     private let scheme: UIScheme
     
     init() {
         appModel = AppModel()
-        modelManager = ModelManager(appModel: appModel, LocalModelAdapterFactory())
-        aiMonitor = AIMonitor(appModel, modelManager)
+        modelFactory = LocalModelAdapterFactory()
+        aiMonitor = AIMonitor(appModel, modelFactory)
         settingsModel = AppSettingsModel()
         clipboardManager = ClipboardManager(appModel, aiMonitor)
         scheme = UIScheme()

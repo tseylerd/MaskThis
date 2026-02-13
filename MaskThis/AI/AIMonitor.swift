@@ -4,13 +4,13 @@ import Foundation
 @MainActor
 class AIMonitor {
     private let appModel: AppModel
-    private let modelManager: ModelManager
+    private let modelFactory: ModelFactory
     
     var inference: AIInferenceEngine?
     
-    init(_ appModel: AppModel, _ modelManager: ModelManager) {
+    init(_ appModel: AppModel, _ modelFactory: ModelFactory) {
         self.appModel = appModel
-        self.modelManager = modelManager
+        self.modelFactory = modelFactory
     }
     
     func setupAIMonitoring() {
@@ -43,7 +43,7 @@ class AIMonitor {
         }
         
         do {
-            let model = try await modelManager.initializeModel()
+            let model = try await modelFactory.create()
             inference = AIInferenceEngine(model)
             appModel.modelState = .ready
         } catch {
