@@ -6,12 +6,15 @@ class AIInferenceEngine {
     private static let MAX_TOKENS = 512
     private static let MAX_LENGTH = Util.tokensToSymbols(2048)
     
-    private static let PROMPTS = Util.loadPrompts()
-    
     let model: SystemLanguageModel
+    
+    private let preprocessor: TextProcessor
+    private let postProcessor: TextProcessor
     
     init(_ model: SystemLanguageModel) {
         self.model = model
+        self.preprocessor = InputPreprocessor()
+        self.postProcessor = OutputProcessor()
     }
     
     func mask(_ text: String) async throws -> String {
@@ -25,7 +28,8 @@ class AIInferenceEngine {
         let chunks = split(text, maxSymbols)
         for chunk in chunks {
             let session = LanguageModelSession(model: model)
-            result += try await session.respond(to: Util.embed(text: chunk, to: Self.PROMPTS.mask.user), generating: String.self).content
+            let localResult = try await session.respond(to: preprocessor.process(chunk), generating: String.self, options: GenerationOptions(temperature: 0.1)).content
+            result += postProcessor.process(localResult)
         }
         return result
     }
@@ -41,11 +45,24 @@ class AIInferenceEngine {
     }
 }
 
-struct PromptsCollection {
-    let mask: AIPrompt
+protocol TextProcessor {
+    func process(_ string: String) -> String
 }
 
-struct AIPrompt {
-    let instructions: String
-    let user: String
+fileprivate class InputPreprocessor: TextProcessor {
+    fileprivate static let PREFIX = "[RAW] "
+    
+    func process(_ string: String) -> String {
+        "\(Self.PREFIX)\(string)"
+    }
+}
+
+fileprivate class OutputProcessor: TextProcessor {
+    func process(_ string: String) -> String {
+        if string.starts(with: InputPreprocessor.PREFIX) {
+            String(string.suffix(string.count - InputPreprocessor.PREFIX.count))
+        } else {
+            string
+        }
+    }
 }
