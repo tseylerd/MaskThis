@@ -63,6 +63,10 @@ class ClipboardManager {
         guard let items = NSPasteboard.general.pasteboardItems else {
             return
         }
+        model.appStatus = .processing
+        defer {
+            model.appStatus = .ready
+        }
         
         var newItems: [NSPasteboardItem] = []
         var toMask: String? = nil
