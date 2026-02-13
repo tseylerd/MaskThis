@@ -7,5 +7,5 @@ class AppSettings {
     private init() { }
     
     @AppStorage("show.notification") var showNotification: Bool = true
-    @AppStorage("enabled") var enabled: Bool = true
+    @AppStorage("auto") var auto: Bool = true
 }

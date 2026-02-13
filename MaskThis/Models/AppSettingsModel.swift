@@ -8,7 +8,7 @@ class AppSettingsModel {
     private static nonisolated let LOG = Logger(subsystem: Subsystems.SETTINGS, category: "AppSettingsModel")
     
     var showNotification: Bool = AppSettings.shared.showNotification
-    var enabled: Bool = AppSettings.shared.enabled
+    var auto: Bool = AppSettings.shared.auto
     
     private var _launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
     

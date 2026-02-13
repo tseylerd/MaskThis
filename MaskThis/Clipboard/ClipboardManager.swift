@@ -21,11 +21,11 @@ class ClipboardManager {
             while true {
                 await Util.delay(.milliseconds(500))
                 
-                guard await AppSettings.shared.enabled else {
+                guard await AppSettings.shared.auto else {
                     await Util.delay(.seconds(1))
                     continue
                 }
-                
+
                 guard case .ready = await self.model.appStatus else {
                     Self.LOG.info("App is not ready")
                     await Util.delay(.seconds(1))

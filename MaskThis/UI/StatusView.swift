@@ -14,10 +14,10 @@ struct StatusView: View {
                 AIErrorView(reason: reason)
             } else if !model.modelState.isReady {
                 AdapterStateView(state: model.modelState)
-            } else if settings.enabled {
-                ReadyView()
+            } else if settings.auto {
+                AutoModeStatusView()
             } else {
-                DisabledView()
+                ManualModeStatusView()
             }
         }
     }

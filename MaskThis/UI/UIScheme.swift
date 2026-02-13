@@ -7,8 +7,12 @@ class UIScheme {
         .red
     }
     
-    var readyImage: String {
-        "checkmark.circle"
+    var autoModeImage: String {
+        "sparkles"
+    }
+    
+    var manualModeImage: String {
+        "hand.raised"
     }
     
     var progressImage: String {

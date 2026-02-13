@@ -30,8 +30,8 @@ struct MaskThisApp: App {
                 .environment(scheme)
                 .onChange(of: settingsModel.showNotification) {
                     AppSettings.shared.showNotification = settingsModel.showNotification
-                } .onChange(of: settingsModel.enabled) {
-                    AppSettings.shared.enabled = settingsModel.enabled
+                } .onChange(of: settingsModel.auto) {
+                    AppSettings.shared.auto = settingsModel.auto
                 }
         }
     }
