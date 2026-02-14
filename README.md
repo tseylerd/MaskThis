@@ -1,4 +1,4 @@
-# Mask This
+# <img src="Images/Logo.png" width="128" height="128">
 
 **Mask This** is a macOS menu bar application that uses Apple Intelligence to automatically detect and mask sensitive information in your clipboard in real-time.
 
