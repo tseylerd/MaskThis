@@ -17,6 +17,7 @@ class LocalModelAdapterFactory: ModelFactory {
     }
 }
 
+@MainActor
 open class BGAssetsBasedFactory: ModelFactory {
     fileprivate static nonisolated let LOG = Logger(subsystem: Subsystems.AI, category: "BGAssetsFactory")
     
@@ -42,7 +43,10 @@ open class BGAssetsBasedFactory: ModelFactory {
         progressTask?.cancel()
         progressTask = nil
         
-        let adapterUrl = try AssetPackManager.shared.url(for: .init(path))
+        let adapterUrl = try await Task.detached(priority: .high) {
+            try AssetPackManager.shared.url(for: .init(self.path))
+        }.value
+        
         let model = try createModel(adapterUrl)
         return model
     }
