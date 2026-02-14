@@ -59,6 +59,12 @@ struct NotificationView: View {
                     .multilineTextAlignment(.center)
                     .font(.title.weight(.light))
             }
+            
+            if let note = data.note {
+                Text(note)
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+            }
         }
         .padding()
         .background(backgroundColor)
@@ -69,6 +75,7 @@ struct NotificationView: View {
 struct NotificationData {
     let title: String
     let subtitle: String?
+    let note: String?
     let type: NotificationType
     let autoClose: Bool
     let progress: Bool

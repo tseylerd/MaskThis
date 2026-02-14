@@ -119,6 +119,7 @@ class ClipboardManager {
                 NotificationData(
                     title: UITexts.Notifications.maskingSensitiveInformation,
                     subtitle: nil,
+                    note: nil,
                     type: .info,
                     autoClose: false,
                     progress: true
@@ -155,6 +156,7 @@ class ClipboardManager {
                 NotificationData(
                     title: UITexts.Notifications.nothingMasked,
                     subtitle: nil,
+                    note: nil,
                     type: .info,
                     autoClose: true,
                     progress: false
@@ -178,6 +180,7 @@ class ClipboardManager {
                 NotificationData(
                     title: UITexts.Notifications.successfullyMasked,
                     subtitle: nil,
+                    note: UITexts.Notifications.successfullyMaskedNote,
                     type: .info,
                     autoClose: true,
                     progress: false
@@ -193,7 +196,7 @@ class ClipboardManager {
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")
             if await AppSettings.shared.showNotification {
-                _ = await notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, type: .error, autoClose: true, progress: false))
+                _ = await notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false))
             }
             await MainActor.run {
                 model.lastError = error.localizedDescription
