@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct NotificationView: View {
+    @Environment(UIScheme.self) var scheme
+    
     let data: NotificationData
     
     var backgroundColor: Color {
@@ -8,9 +10,9 @@ struct NotificationView: View {
         case .info:
                 .gray.opacity(0.1)
         case .error:
-                .red.opacity(0.2)
+                .red.opacity(0.4)
         case .warining:
-                .orange.opacity(0.2)
+                .orange.opacity(0.4)
         }
     }
     
@@ -35,10 +37,22 @@ struct NotificationView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            Label(data.title, systemImage: image)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .font(.title.weight(titleWeight))
+            if data.progress {
+                HStack {
+                    ProgressView()
+                        .font(.title.weight(titleWeight))
+                    Text(data.title)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .font(.title.weight(titleWeight))
+                }
+            } else {
+                Label(data.title, systemImage: image)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .font(.title.weight(titleWeight))
+            }
+            
             if let subtitle = data.subtitle {
                 Text(subtitle)
                     .foregroundStyle(.secondary)
@@ -56,6 +70,8 @@ struct NotificationData {
     let title: String
     let subtitle: String?
     let type: NotificationType
+    let autoClose: Bool
+    let progress: Bool
 }
 
 enum NotificationType {

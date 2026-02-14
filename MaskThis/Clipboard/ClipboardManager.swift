@@ -9,6 +9,7 @@ class ClipboardManager {
     
     private let model: AppModel
     private let aiMonitor: AIMonitor
+    private let notificationsManager: CustomNotificationManager
     
     @ObservationIgnored
     private var currentChangeCount: Int = 0
@@ -29,9 +30,10 @@ class ClipboardManager {
         return true
     }
     
-    init(_ appModel: AppModel, _ aiMonitor: AIMonitor) {
+    init(_ appModel: AppModel, _ aiMonitor: AIMonitor, _ notificationsManager: CustomNotificationManager) {
         self.model = appModel
         self.aiMonitor = aiMonitor
+        self.notificationsManager = notificationsManager
         
         KeyboardShortcuts.onKeyUp(for: .maskClipboardContent) {
             Task(priority: .userInitiated) {
@@ -87,10 +89,6 @@ class ClipboardManager {
         guard let items = NSPasteboard.general.pasteboardItems else {
             return
         }
-        model.appStatus = .processing
-        defer {
-            model.appStatus = .ready
-        }
         
         var newItems: [NSPasteboardItem] = []
         var toMask: String? = nil
@@ -109,18 +107,43 @@ class ClipboardManager {
             return
         }
         
+        
+        model.appStatus = .processing
+        defer {
+            model.appStatus = .ready
+        }
+        
+        var sessionId: UUID? = nil
+        if AppSettings.shared.showNotification {
+            sessionId = await notificationsManager.show(
+                NotificationData(
+                    title: UITexts.Notifications.maskingSensitiveInformation,
+                    subtitle: nil,
+                    type: .info,
+                    autoClose: false,
+                    progress: true
+                )
+            )
+        }
+        
         let processedText = await Task.detached(priority: .high) {
             await self.processText(engine, toMask)
         }.value
         
         guard let processedText else {
             Self.LOG.info("Processed text is nil")
+            if let sessionId {
+                notificationsManager.hide(sessionId)
+            }
             return
         }
         
         let changesCountNow = NSPasteboard.general.changeCount
         guard changesCountNow == newCount else {
             Self.LOG.info("Noticed change in between")
+            if let sessionId {
+                notificationsManager.hide(sessionId)
+            }
             return
         }
         
@@ -128,6 +151,9 @@ class ClipboardManager {
         
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
+            if let sessionId {
+                notificationsManager.hide(sessionId)
+            }
             return
         }
         
@@ -142,11 +168,13 @@ class ClipboardManager {
         Self.LOG.info("Setting new items")
         
         if AppSettings.shared.showNotification {
-            await CustomNotificationManager.shared.show(
+            _ = await notificationsManager.show(
                 NotificationData(
                     title: UITexts.Notifications.successfullyMasked,
                     subtitle: nil,
-                    type: .info
+                    type: .info,
+                    autoClose: true,
+                    progress: false
                 )
             )
         }
@@ -159,7 +187,7 @@ class ClipboardManager {
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")
             if await AppSettings.shared.showNotification {
-                await CustomNotificationManager.shared.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, type: .error))
+                _ = await notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, type: .error, autoClose: true, progress: false))
             }
             await MainActor.run {
                 model.lastError = error.localizedDescription

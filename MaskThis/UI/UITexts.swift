@@ -4,8 +4,9 @@ nonisolated struct UITexts {
     struct Notifications {
         private init() { }
         
-        static let successfullyMasked = "Sensitive Data Hidden"
-        static let error = "Masking Failed"
+        static let maskingSensitiveInformation = "Masking sensitive information..."
+        static let successfullyMasked = "Sensitive information masked"
+        static let error = "Masking failed"
     }
     
     struct Settings {

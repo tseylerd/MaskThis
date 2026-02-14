@@ -9,14 +9,16 @@ struct MaskThisApp: App {
     private let modelFactory: ModelFactory
     private let settingsModel: AppSettingsModel
     private let scheme: UIScheme
+    private let notificationsManager: CustomNotificationManager
     
     init() {
         appModel = AppModel()
+        scheme = UIScheme()
         modelFactory = BGAssetsFactory(appModel: appModel)
         aiMonitor = AIMonitor(appModel, modelFactory)
         settingsModel = AppSettingsModel()
-        clipboardManager = ClipboardManager(appModel, aiMonitor)
-        scheme = UIScheme()
+        notificationsManager = CustomNotificationManager(appSettingsModel: settingsModel, scheme: scheme)
+        clipboardManager = ClipboardManager(appModel, aiMonitor, notificationsManager)
         
         clipboardManager.subscribeOnChanges()
         aiMonitor.setupAIMonitoring()
