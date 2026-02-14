@@ -47,67 +47,74 @@ class CustomNotificationManager {
         }
     }
     
-    func show(_ data: NotificationData) async -> UUID {
+    func show(_ data: NotificationData) -> UUID {
         window?.close()
         window = nil
         
         let newSessionId = UUID()
         sessionId = newSessionId
         
-        let view = NotificationView(data: data)
-            .environment(appSettingsModel)
-            .environment(scheme)
-            .fixedSize()
-        let hostingController = NSHostingController(rootView: view)
-        let newWindow = NSWindow(
-            contentRect: NSRect(
-                x: 0,
-                y: 0,
-                width: 200,
-                height: 100
-            ),
-            styleMask: [.borderless, .nonactivatingPanel],
-            backing: .buffered,
-            defer: false
-        )
+        Task(priority: .userInitiated) { @MainActor in
+            guard self.sessionId == newSessionId else {
+                return
+            }
             
-        newWindow.contentViewController = hostingController
-        newWindow.backgroundColor = .clear
-        newWindow.hasShadow = false
-        newWindow.level = .floating
-        newWindow.ignoresMouseEvents = true
-        newWindow.isReleasedWhenClosed = false
-        newWindow.center()
-        
-        let targetSize = hostingController.sizeThatFits(in: CGSize(width: CGFloat.infinity, height: CGFloat.infinity))
-        newWindow.setContentSize(targetSize)
-        newWindow.alphaValue = 0
-        if let targetPoint = calculatePosition(relativeTo: targetSize) {
-            newWindow.setFrameOrigin(targetPoint)
-        }
-        
-        newWindow.orderFront(nil)
-        self.window = newWindow
-        
-        await NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.5
-            context.timingFunction = CAMediaTimingFunction(name: .default)
+            let view = NotificationView(data: data)
+                .environment(appSettingsModel)
+                .environment(scheme)
+                .fixedSize()
+            let hostingController = NSHostingController(rootView: view)
+            let newWindow = NSWindow(
+                contentRect: NSRect(
+                    x: 0,
+                    y: 0,
+                    width: 200,
+                    height: 100
+                ),
+                styleMask: [.borderless, .nonactivatingPanel],
+                backing: .buffered,
+                defer: false
+            )
+                
+            newWindow.contentViewController = hostingController
+            newWindow.backgroundColor = .clear
+            newWindow.hasShadow = false
+            newWindow.level = .floating
+            newWindow.ignoresMouseEvents = true
+            newWindow.isReleasedWhenClosed = false
+            newWindow.center()
             
-            newWindow.animator().alphaValue = 1.0
-        }
-        
-        await Util.delay(.seconds(3))
-        
-        guard newSessionId == sessionId else {
-            return newSessionId
-        }
-        
-        guard data.autoClose else {
-            return newSessionId
-        }
-        
-        hide(newSessionId, newWindow) {
-            self.window = nil
+            let targetSize = hostingController.sizeThatFits(in: CGSize(width: CGFloat.infinity, height: CGFloat.infinity))
+            newWindow.setContentSize(targetSize)
+            newWindow.alphaValue = 0
+            if let targetPoint = calculatePosition(relativeTo: targetSize) {
+                newWindow.setFrameOrigin(targetPoint)
+            }
+            
+            newWindow.orderFront(nil)
+            self.window = newWindow
+            
+            await NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.5
+                context.timingFunction = CAMediaTimingFunction(name: .default)
+                
+                newWindow.animator().alphaValue = 1.0
+            }
+            
+            await Util.delay(.seconds(3))
+            
+            guard newSessionId == sessionId else {
+                return
+            }
+            
+            guard data.autoClose else {
+                return
+            }
+            
+            hide(newSessionId, newWindow) {
+                self.window = nil
+            }
+            
         }
         
         return newSessionId
