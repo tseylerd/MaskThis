@@ -9,6 +9,7 @@ class AppSettingsModel {
     
     var showNotification: Bool = AppSettings.shared.showNotification
     var auto: Bool = AppSettings.shared.auto
+    var tab: SettingsTab = .general
     
     private var _launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
     
@@ -42,4 +43,9 @@ class AppSettingsModel {
             Self.LOG.error("Failed to disable launch at login: \(error.localizedDescription)")
         }
     }
+}
+
+enum SettingsTab: Hashable {
+    case general
+    case ossSoftware
 }

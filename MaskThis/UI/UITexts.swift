@@ -19,6 +19,12 @@ nonisolated struct UITexts {
             
             static let tabName = "General"
         }
+        
+        struct OSS {
+            private init() { }
+            
+            static let tabName = "OSS Software"
+        }
     }
     
     struct Actions {

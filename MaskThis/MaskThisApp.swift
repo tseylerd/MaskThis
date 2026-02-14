@@ -39,6 +39,7 @@ struct MaskThisApp: App {
         Settings {
             SettingsView()
                 .environment(scheme)
+                .environment(settingsModel)
         }
     }
 }

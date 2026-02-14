@@ -19,6 +19,10 @@ class UIScheme {
         "gear"
     }
     
+    var ossSettingsImage: String {
+        "chevron.left.slash.chevron.right"
+    }
+    
     var eyeDisabledImage: String {
         "eye.slash.fill"
     }
