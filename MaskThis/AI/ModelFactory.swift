@@ -19,8 +19,6 @@ class LocalModelAdapterFactory: ModelFactory {
 
 open class BGAssetsBasedFactory: ModelFactory {
     fileprivate static nonisolated let LOG = Logger(subsystem: Subsystems.AI, category: "BGAssetsFactory")
-
-    private static nonisolated let PACK_ID = "MaskThisTestAssets"
     
     private let appModel: AppModel
     private let assetsId: String
@@ -35,7 +33,7 @@ open class BGAssetsBasedFactory: ModelFactory {
     }
     
     func create() async throws -> SystemLanguageModel {
-        let assetPack = try await AssetPackManager.shared.assetPack(withID: Self.PACK_ID)
+        let assetPack = try await AssetPackManager.shared.assetPack(withID: assetsId)
         
         runProgressTask()
         
@@ -55,7 +53,7 @@ open class BGAssetsBasedFactory: ModelFactory {
     
     private func runProgressTask() {
         progressTask = Task.detached(priority: .background) {
-            let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: Self.PACK_ID)
+            let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: self.assetsId)
             for await statusUpdate in statusUpdates {
                 switch statusUpdate {
                 case .began(_):
