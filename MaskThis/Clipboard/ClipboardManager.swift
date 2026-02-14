@@ -12,7 +12,7 @@ class ClipboardManager {
     private let notificationsManager: CustomNotificationManager
     
     @ObservationIgnored
-    private var currentChangeCount: Int = 0
+    private var lastState: ClipboardState?
     
     var canMask: Bool {
         guard case .ready = self.model.appStatus else {
@@ -43,7 +43,7 @@ class ClipboardManager {
     }
     
     func subscribeOnChanges() {
-        self.currentChangeCount = NSPasteboard.general.changeCount
+        self.lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: nil)
         Task.detached(priority: .background) {
             while true {
                 await Util.delay(.milliseconds(500))
@@ -77,36 +77,27 @@ class ClipboardManager {
     
     private func processClipboard(_ engine: AIInferenceEngine) async {
         let newCount = NSPasteboard.general.changeCount
-        guard newCount != currentChangeCount else {
+        guard newCount != lastState?.changes else {
             return
         }
 
         Self.LOG.info("Processing clipboard on change count: \(newCount)")
 
         model.lastError = nil
-        self.currentChangeCount = newCount
         
-        guard let items = NSPasteboard.general.pasteboardItems else {
+        guard let (toMask, toLeave) = findTextToMask(), let toMask else {
+            Self.LOG.info("Failed to find text in clipboard")
+            lastState = ClipboardState(changes: newCount, string: nil)
             return
         }
         
-        var newItems: [NSPasteboardItem] = []
-        var toMask: String? = nil
-        for item in items {
-            guard item.isTextType else {
-                newItems.append(item)
-                continue
-            }
-            guard let string = item.asString() else {
-                continue
-            }
-            toMask = string
-        }
-        guard let toMask else {
-            Self.LOG.info("Nothing to mask")
+        guard lastState?.string != toMask else {
+            lastState = ClipboardState(changes: newCount, string: toMask)
+            Self.LOG.info("Text is not changed")
             return
         }
         
+        lastState = ClipboardState(changes: newCount, string: toMask)
         
         model.appStatus = .processing
         defer {
@@ -139,16 +130,13 @@ class ClipboardManager {
             return
         }
         
-        let changesCountNow = NSPasteboard.general.changeCount
-        guard changesCountNow == newCount else {
-            Self.LOG.info("Noticed change in between")
+        if let (currentTextToMask, _) = findTextToMask(), currentTextToMask != toMask {
+            Self.LOG.info("Text changed while processing")
             if let sessionId {
                 notificationsManager.hide(sessionId)
             }
             return
         }
-        
-        currentChangeCount = NSPasteboard.general.changeCount
         
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
@@ -169,7 +157,9 @@ class ClipboardManager {
             return
         }
         
+        Self.LOG.info("Setting new items")
         let newItem = NSPasteboardItem()
+        var newItems: [NSPasteboardItem] = Array(toLeave)
         
         newItem.setData(processedText.data(using: .utf8)!, forType: .string)
         newItems.append(newItem)
@@ -177,7 +167,7 @@ class ClipboardManager {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.writeObjects(newItems)
 
-        Self.LOG.info("Setting new items")
+        lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: processedText)
         
         if AppSettings.shared.showResultNotification {
             _ = await notificationsManager.show(
@@ -191,6 +181,26 @@ class ClipboardManager {
                 )
             )
         }
+    }
+    
+    private nonisolated func findTextToMask() -> (String?, [NSPasteboardItem])? {
+        guard let items = NSPasteboard.general.pasteboardItems else {
+            return nil
+        }
+        
+        var itemsToLeave: [NSPasteboardItem] = []
+        var toMask: String? = nil
+        for item in items {
+            guard item.isTextType else {
+                itemsToLeave.append(item)
+                continue
+            }
+            guard let string = item.asString() else {
+                continue
+            }
+            toMask = string
+        }
+        return (toMask, itemsToLeave)
     }
     
     private nonisolated func processText(_ engine: AIInferenceEngine, _ text: String) async -> String? {
@@ -210,7 +220,7 @@ class ClipboardManager {
     }
 }
 
-fileprivate extension NSPasteboardItem {
+fileprivate nonisolated extension NSPasteboardItem {
     var isTextType: Bool {
         types.contains(.string) ||
         types.contains(.html) ||
@@ -230,4 +240,9 @@ fileprivate extension NSPasteboardItem {
         
         return String(data: string, encoding: .utf8)
     }
+}
+
+fileprivate struct ClipboardState {
+    let changes: Int
+    let string: String?
 }
