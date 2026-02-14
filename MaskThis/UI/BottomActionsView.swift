@@ -20,6 +20,8 @@ struct BottomActionsView: View {
                 Label(UITexts.Actions.about, systemImage: scheme.aboutImage)
             }
 
+            ContactUsLink()
+            RateAppLink()
             Divider()
             Button(UITexts.Actions.quit) {
                 NSApplication.shared.terminate(nil)

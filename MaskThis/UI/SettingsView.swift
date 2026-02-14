@@ -24,7 +24,7 @@ struct SettingsView: View {
 fileprivate struct GeneralTabView: View {
     var body: some View {
         Form {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .center, spacing: 12) {
                 OptionsView(hints: true)
                 VStack {
                     HStack {
@@ -34,6 +34,10 @@ fileprivate struct GeneralTabView: View {
                     Text(UITexts.Settings.General.shortcutDescription)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                }
+                VStack(alignment: .center) {
+                    ContactUsLink()
+                    RateAppLink()
                 }
                 Spacer()
             }

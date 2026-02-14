@@ -11,12 +11,20 @@ class UIScheme {
         "sparkles"
     }
     
+    var feedbackImage: String {
+        "envelope.fill"
+    }
+    
     var aboutImage: String {
         "info.circle"
     }
     
     var manualModeImage: String {
         "hand.raised"
+    }
+    
+    var rateAppImage: String {
+        "star.fill"
     }
     
     var generalSettingsImage: String {
