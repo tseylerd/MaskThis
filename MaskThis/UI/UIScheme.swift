@@ -15,6 +15,10 @@ class UIScheme {
         "hand.raised"
     }
     
+    var generalSettingsImage: String {
+        "gear"
+    }
+    
     var eyeDisabledImage: String {
         "eye.slash.fill"
     }

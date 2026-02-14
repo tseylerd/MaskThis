@@ -35,5 +35,10 @@ struct MaskThisApp: App {
                     AppSettings.shared.auto = settingsModel.auto
                 }
         }
+        
+        Settings {
+            SettingsView()
+                .environment(scheme)
+        }
     }
 }

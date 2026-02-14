@@ -8,6 +8,19 @@ nonisolated struct UITexts {
         static let error = "Masking Failed"
     }
     
+    struct Settings {
+        private init() { }
+        
+        struct General {
+            private init() { }
+            
+            static let shortcut = "Global shortcut"
+            static let shortcutDescription = "Global shortcut to mask sensitive information in the clipboard"
+            
+            static let tabName = "General"
+        }
+    }
+    
     struct Actions {
         private init() { }
         
