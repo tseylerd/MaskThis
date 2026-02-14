@@ -17,7 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """)
     ]
     
-    @State private var expanded: [UUID: Bool] = [:]
+    @State private var expanded: [UUID: Bool] = [Self.LICENSES.first!.id : true]
     
     var body: some View {
         ScrollView {

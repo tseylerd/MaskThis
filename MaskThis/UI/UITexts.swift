@@ -33,6 +33,7 @@ nonisolated struct UITexts {
         static let quit = "Quit Mask This"
         static let mask = "Mask Clipboard"
         static let about = "About"
+        static let ossUsed = "Open Source Software Used"
     }
     
     struct Toggles {
