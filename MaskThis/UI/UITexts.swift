@@ -39,7 +39,11 @@ nonisolated struct UITexts {
         private init() { }
         
         static let auto = "Mask Clipboard Automatically"
+        static let autoDescription = "Sensitive information in the clipboard will be masked automatically"
+        
         static let showNotifications = "Show Notifications"
+        static let showNotificationsDescription = "Show notifications when information is masked"
+        
         static let launchAtLogin = "Launch at Login"
     }
     

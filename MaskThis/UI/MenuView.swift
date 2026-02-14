@@ -6,7 +6,7 @@ struct MenuView: View {
             StatusView()
             ActionsView()
             Divider()
-            OptionsView()
+            OptionsView(hints: false)
             Divider()
             BottomActionsView()
         }

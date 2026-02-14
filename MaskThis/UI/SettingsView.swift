@@ -25,7 +25,7 @@ fileprivate struct GeneralTabView: View {
     var body: some View {
         Form {
             VStack(alignment: .leading, spacing: 12) {
-                OptionsView()
+                OptionsView(hints: true)
                 VStack {
                     HStack {
                         Text(UITexts.Settings.General.shortcut)
