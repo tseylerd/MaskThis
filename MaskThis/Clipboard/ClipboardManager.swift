@@ -81,7 +81,7 @@ class ClipboardManager {
             return
         }
 
-        Self.LOG.info("Processing clipboard")
+        Self.LOG.info("Processing clipboard on change count: \(newCount)")
 
         model.lastError = nil
         self.currentChangeCount = newCount
