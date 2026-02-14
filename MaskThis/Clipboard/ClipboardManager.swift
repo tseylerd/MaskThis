@@ -8,6 +8,7 @@ class ClipboardManager {
     private static nonisolated let LOG = Logger(subsystem: Subsystems.CLIPBOARD, category: "ClipboardManager")
     
     private let model: AppModel
+    private let settingsModel: AppSettingsModel
     private let aiMonitor: AIMonitor
     private let notificationsManager: CustomNotificationManager
     
@@ -30,10 +31,11 @@ class ClipboardManager {
         return true
     }
     
-    init(_ appModel: AppModel, _ aiMonitor: AIMonitor, _ notificationsManager: CustomNotificationManager) {
+    init(_ appModel: AppModel, _ aiMonitor: AIMonitor, _ settingsModel: AppSettingsModel, _ notificationsManager: CustomNotificationManager) {
         self.model = appModel
         self.aiMonitor = aiMonitor
         self.notificationsManager = notificationsManager
+        self.settingsModel = settingsModel
         
         KeyboardShortcuts.onKeyUp(for: .maskClipboardContent) {
             Task(priority: .userInitiated) {
@@ -48,7 +50,7 @@ class ClipboardManager {
             while true {
                 await Util.delay(.milliseconds(500))
                 
-                guard await AppSettings.shared.auto else {
+                guard await self.settingsModel.auto else {
                     await Util.delay(.seconds(1))
                     continue
                 }
@@ -105,7 +107,7 @@ class ClipboardManager {
         }
         
         var sessionId: UUID? = nil
-        if AppSettings.shared.showProgressNotification {
+        if settingsModel.showProgressNotification {
             sessionId = notificationsManager.show(
                 NotificationData(
                     title: UITexts.Notifications.maskingSensitiveInformation,
@@ -138,7 +140,7 @@ class ClipboardManager {
         
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
-            if AppSettings.shared.showResultNotification {
+            if settingsModel.showResultNotification {
                 _ = notificationsManager.show(
                     NotificationData(
                         title: UITexts.Notifications.nothingMasked,
@@ -167,7 +169,7 @@ class ClipboardManager {
 
         lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: processedText)
         
-        if AppSettings.shared.showResultNotification {
+        if settingsModel.showResultNotification {
             _ = notificationsManager.show(
                 NotificationData(
                     title: UITexts.Notifications.successfullyMasked,
@@ -207,8 +209,8 @@ class ClipboardManager {
             return try await engine.mask(text)
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")
-            if AppSettings.shared.showResultNotification {
-                _ = await notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false))
+            if settingsModel.showResultNotification {
+                _ = notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false))
             }
             await MainActor.run {
                 model.lastError = error.localizedDescription

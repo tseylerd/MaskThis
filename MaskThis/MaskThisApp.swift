@@ -18,7 +18,7 @@ struct MaskThisApp: App {
         aiMonitor = AIMonitor(appModel, modelFactory)
         settingsModel = AppSettingsModel()
         notificationsManager = CustomNotificationManager(appSettingsModel: settingsModel, scheme: scheme)
-        clipboardManager = ClipboardManager(appModel, aiMonitor, notificationsManager)
+        clipboardManager = ClipboardManager(appModel, aiMonitor, settingsModel, notificationsManager)
         
         clipboardManager.subscribeOnChanges()
         aiMonitor.setupAIMonitoring()
