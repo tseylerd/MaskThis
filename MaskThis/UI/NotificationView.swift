@@ -8,7 +8,7 @@ struct NotificationView: View {
     var backgroundColor: Color {
         switch data.type {
         case .info:
-                .gray.opacity(0.1)
+                .gray.opacity(0.2)
         case .error:
                 .red.opacity(0.4)
         case .warining:

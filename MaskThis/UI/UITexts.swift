@@ -6,6 +6,7 @@ nonisolated struct UITexts {
         
         static let maskingSensitiveInformation = "Masking sensitive information..."
         static let successfullyMasked = "Sensitive information masked"
+        static let nothingMasked = "No sensitive information found"
         static let error = "Masking failed"
     }
     

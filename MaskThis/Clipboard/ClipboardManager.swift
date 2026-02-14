@@ -151,9 +151,15 @@ class ClipboardManager {
         
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
-            if let sessionId {
-                notificationsManager.hide(sessionId)
-            }
+            _ = await notificationsManager.show(
+                NotificationData(
+                    title: UITexts.Notifications.nothingMasked,
+                    subtitle: nil,
+                    type: .info,
+                    autoClose: true,
+                    progress: false
+                )
+            )
             return
         }
         
