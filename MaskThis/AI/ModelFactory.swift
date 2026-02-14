@@ -81,7 +81,7 @@ open class BGAssetsBasedFactory: ModelFactory {
 @MainActor
 class BGAssetsFactory: BGAssetsBasedFactory {
     init(appModel: AppModel) {
-        super.init(appModel: appModel, path: "Content/mask_adapter.fmadapter", assets: "MaskThisTestAssets")
+        super.init(appModel: appModel, path: "mask_adapter.fmadapter", assets: "MaskThisModelAdapter262")
     }
 }
 

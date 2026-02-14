@@ -12,7 +12,7 @@ struct MaskThisApp: App {
     
     init() {
         appModel = AppModel()
-        modelFactory = LocalModelAdapterFactory()
+        modelFactory = BGAssetsFactory(appModel: appModel)
         aiMonitor = AIMonitor(appModel, modelFactory)
         settingsModel = AppSettingsModel()
         clipboardManager = ClipboardManager(appModel, aiMonitor)
