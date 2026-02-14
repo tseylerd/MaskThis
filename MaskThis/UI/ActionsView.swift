@@ -18,7 +18,5 @@ struct ActionsView: View {
         }
         .disabled(disabled || !clipboardManager.canMask)
         .globalKeyboardShortcut(.maskClipboardContent)
-        
-        SettingsLink()
     }
 }

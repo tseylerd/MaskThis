@@ -8,10 +8,7 @@ struct MenuView: View {
             Divider()
             OptionsView()
             Divider()
-            
-            Button(UITexts.Actions.quit) {
-                NSApplication.shared.terminate(nil)
-            }
+            BottomActionsView()
         }
     }
 }
