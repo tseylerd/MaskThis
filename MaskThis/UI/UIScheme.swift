@@ -11,6 +11,10 @@ class UIScheme {
         "sparkles"
     }
     
+    var aboutImage: String {
+        "info.circle"
+    }
+    
     var manualModeImage: String {
         "hand.raised"
     }

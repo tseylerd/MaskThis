@@ -24,14 +24,18 @@ struct SettingsView: View {
 fileprivate struct GeneralTabView: View {
     var body: some View {
         Form {
-            VStack {
-                HStack {
-                    Text(UITexts.Settings.General.shortcut)
-                    KeyboardShortcuts.Recorder(for: .maskClipboardContent)
+            VStack(alignment: .leading, spacing: 12) {
+                OptionsView()
+                VStack {
+                    HStack {
+                        Text(UITexts.Settings.General.shortcut)
+                        KeyboardShortcuts.Recorder(for: .maskClipboardContent)
+                    }
+                    Text(UITexts.Settings.General.shortcutDescription)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
-                Text(UITexts.Settings.General.shortcutDescription)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                Spacer()
             }
         }
     }
