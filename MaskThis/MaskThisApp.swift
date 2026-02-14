@@ -43,5 +43,12 @@ struct MaskThisApp: App {
                 .environment(scheme)
                 .environment(settingsModel)
         }
+        
+        Window(UITexts.Titles.howToUse, id: Constants.WindowID.howToUse) {
+            HowToUseView()
+                .environment(scheme)
+                .scenePadding()
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }

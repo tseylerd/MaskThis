@@ -4,6 +4,6 @@ struct Constants {
     struct WindowID {
         private init() { }
         
-        static let shortcutSettings = "shortcut-settings"
+        static let howToUse = "how.to.use"
     }
 }

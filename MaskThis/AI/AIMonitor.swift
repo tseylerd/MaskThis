@@ -1,6 +1,7 @@
 import FoundationModels
 import Foundation
 
+@Observable
 @MainActor
 class AIMonitor {
     private let appModel: AppModel
@@ -30,9 +31,9 @@ class AIMonitor {
     private func processModelAvailability() -> AppleIntelligenceStatus {
         let availability = SystemLanguageModel.default.availability
         if case .available = availability {
-            appModel.aiStatus = .ready
+            appModel.markAppleIntelligenceReady()
         } else if case .unavailable(let unavailableReason) = availability {
-            appModel.aiStatus = .unavailable(reason: unavailableReason)
+            appModel.markAppleIntelligenceUnavailable(unavailableReason)
         }
         return appModel.aiStatus
     }

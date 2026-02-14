@@ -15,6 +15,14 @@ class UIScheme {
         "envelope.fill"
     }
     
+    var feedbackImageNoFill: String {
+        "envelope"
+    }
+    
+    var helpImage: String {
+        "questionmark.circle"
+    }
+    
     var aboutImage: String {
         "info.circle"
     }
@@ -25,6 +33,30 @@ class UIScheme {
     
     var rateAppImage: String {
         "star.fill"
+    }
+    
+    var privacyImage: String {
+        "lock.shield"
+    }
+    
+    var launchAtLoginImage: String {
+        "bolt.circle"
+    }
+    
+    var notificationsImage: String {
+        "bell.badge"
+    }
+    
+    var modesImage: String {
+        "rectangle.and.hand.point.up.left.fill"
+    }
+    
+    var runInBackgroundImage: String {
+        "menubar.arrow.up.rectangle"
+    }
+    
+    var howToUseImage: String {
+        "book"
     }
     
     var generalSettingsImage: String {

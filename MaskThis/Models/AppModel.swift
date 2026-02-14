@@ -5,10 +5,28 @@ import FoundationModels
 @Observable
 class AppModel {
     var appStatus: AppStatus = .ready
-    var aiStatus: AppleIntelligenceStatus = .ready
+    private(set) var aiStatus: AppleIntelligenceStatus = .ready
     var modelState: ModelState = .prepare
     
     var lastError: String?
+    
+    func markAppleIntelligenceReady() {
+        if case .ready = aiStatus {
+            return
+        }
+        
+        aiStatus = .ready
+    }
+    
+    func markAppleIntelligenceUnavailable(_ reason: SystemLanguageModel.Availability.UnavailableReason) {
+        if case .unavailable(let myReason) = aiStatus {
+            if myReason == reason {
+                return
+            }
+        }
+        
+        aiStatus = .unavailable(reason: reason)
+    }
 }
 
 enum AppStatus {

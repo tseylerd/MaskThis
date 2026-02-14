@@ -8,20 +8,28 @@ struct BottomActionsView: View {
     var body: some View {
         VStack {
             SettingsLink()
-            Button {
-                settingsModel.tab = .ossSoftware
-                openSettings()
+            Menu {
+                HowToUseLink()
+                
+                ContactUsLink()
+                RateAppLink()
+                
+                Button {
+                    settingsModel.tab = .ossSoftware
+                    openSettings()
+                } label: {
+                    Label(UITexts.Actions.ossUsed, systemImage: scheme.ossSettingsImage)
+                }
+                
+                Button {
+                    NSApp.orderFrontStandardAboutPanel(nil)
+                } label: {
+                    Label(UITexts.Actions.about, systemImage: scheme.aboutImage)
+                }
             } label: {
-                Label(UITexts.Actions.ossUsed, systemImage: scheme.ossSettingsImage)
+                Label(UITexts.Actions.help, systemImage: scheme.helpImage)
             }
-            Button {
-                NSApp.orderFrontStandardAboutPanel(nil)
-            } label: {
-                Label(UITexts.Actions.about, systemImage: scheme.aboutImage)
-            }
-
-            ContactUsLink()
-            RateAppLink()
+            
             Divider()
             Button(UITexts.Actions.quit) {
                 NSApplication.shared.terminate(nil)

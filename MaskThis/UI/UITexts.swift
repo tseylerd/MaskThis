@@ -11,6 +11,12 @@ nonisolated struct UITexts {
         static let error = "Masking failed"
     }
     
+    struct Titles {
+        private init() { }
+        
+        static let howToUse = "How to Use"
+    }
+    
     struct Settings {
         private init() { }
         
@@ -30,10 +36,33 @@ nonisolated struct UITexts {
         }
     }
     
+    struct HowToUse {
+        private init() { }
+        
+        static let privacyTitle = "**Mask This** is private by design."
+        static let privacyNote = "Masking is performed locally using Apple's Foundation Model. Your data never leaves your Mac and is not collected."
+        
+        static let runsInBackgroundTitle = "The app runs in the background and is accessible via the Menu Bar."
+        static let runsInBackgroundNote = "To close the app, select **Quit Mask This** in the menu."
+        
+        static let modesTitle = "Choose between Auto and Manual modes. Auto is active by default. Toggle **Mask Clipboard Automatically** to switch."
+        static let modesNote = "In Auto mode, the app masks sensitive data every time you copy. In Manual mode, use **Mask Clipboard** or press the shortcut (`Cmd+Shift+M` by default)."
+                
+        static let notificationsTitle = "Stay informed with notifications whenever clipboard content is masked."
+        static let notificationsNote = "You can disable these notifications by switching off the **Show Notifications** toggle."
+                
+        static let launchAtLoginTitle = "Start **Mask This** automatically when you log in."
+        static let launchAtLoginNote = "To enable this, simply turn on the **Launch at Login** toggle."
+        
+        static let feedbackTitle = "Feel free to reach out with any feedback."
+    }
+    
     struct Actions {
         private init() { }
         
         static let quit = "Quit Mask This"
+        static let help = "Help"
+        static let howToUse = "How to Use"
         static let mask = "Mask Clipboard"
         static let about = "About"
         static let ossUsed = "Open Source Software Used"
