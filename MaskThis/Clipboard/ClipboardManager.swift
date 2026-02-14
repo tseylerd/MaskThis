@@ -114,7 +114,7 @@ class ClipboardManager {
         }
         
         var sessionId: UUID? = nil
-        if AppSettings.shared.showNotification {
+        if AppSettings.shared.showProgressNotification {
             sessionId = await notificationsManager.show(
                 NotificationData(
                     title: UITexts.Notifications.maskingSensitiveInformation,
@@ -152,16 +152,20 @@ class ClipboardManager {
         
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
-            _ = await notificationsManager.show(
-                NotificationData(
-                    title: UITexts.Notifications.nothingMasked,
-                    subtitle: nil,
-                    note: nil,
-                    type: .info,
-                    autoClose: true,
-                    progress: false
+            if AppSettings.shared.showResultNotification {
+                _ = await notificationsManager.show(
+                    NotificationData(
+                        title: UITexts.Notifications.nothingMasked,
+                        subtitle: nil,
+                        note: nil,
+                        type: .info,
+                        autoClose: true,
+                        progress: false
+                    )
                 )
-            )
+            } else if let sessionId {
+                notificationsManager.hide(sessionId)
+            }
             return
         }
         
@@ -175,7 +179,7 @@ class ClipboardManager {
 
         Self.LOG.info("Setting new items")
         
-        if AppSettings.shared.showNotification {
+        if AppSettings.shared.showResultNotification {
             _ = await notificationsManager.show(
                 NotificationData(
                     title: UITexts.Notifications.successfullyMasked,
@@ -195,7 +199,7 @@ class ClipboardManager {
             return try await engine.mask(text)
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")
-            if await AppSettings.shared.showNotification {
+            if await AppSettings.shared.showResultNotification {
                 _ = await notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false))
             }
             await MainActor.run {

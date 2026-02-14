@@ -7,7 +7,8 @@ import OSLog
 class AppSettingsModel {
     private static nonisolated let LOG = Logger(subsystem: Subsystems.SETTINGS, category: "AppSettingsModel")
     
-    var showNotification: Bool = AppSettings.shared.showNotification
+    var showProgressNotification: Bool = AppSettings.shared.showProgressNotification
+    var showResultNotification: Bool = AppSettings.shared.showResultNotification
     var auto: Bool = AppSettings.shared.auto
     var tab: SettingsTab = .general
     

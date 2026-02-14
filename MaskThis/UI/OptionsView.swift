@@ -17,9 +17,17 @@ struct OptionsView: View {
                 }
             }
             VStack(alignment: .leading, spacing: 4) {
-                Toggle(UITexts.Toggles.showNotifications, isOn: $settings.showNotification)
+                Toggle(UITexts.Toggles.showProgressNotifications, isOn: $settings.showProgressNotification)
                 if hints {
-                    Text(UITexts.Toggles.showNotificationsDescription)
+                    Text(UITexts.Toggles.showProgressNotificationsDescription)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle(UITexts.Toggles.showResultNotifications, isOn: $settings.showResultNotification)
+                if hints {
+                    Text(UITexts.Toggles.showResultNotificationsDescription)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

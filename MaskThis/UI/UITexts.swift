@@ -48,8 +48,8 @@ nonisolated struct UITexts {
         static let modesTitle = "Choose between Auto and Manual modes. Auto is active by default. Toggle **Mask Clipboard Automatically** to switch."
         static let modesNote = "In Auto mode, the app masks sensitive data every time you copy. In Manual mode, use **Mask Clipboard** or press the shortcut (`Cmd+Shift+M` by default)."
                 
-        static let notificationsTitle = "Stay informed with notifications whenever clipboard content is masked."
-        static let notificationsNote = "You can disable these notifications by switching off the **Show Notifications** toggle."
+        static let notificationsTitle = "Stay informed with notifications whenever clipboard content is processing or masked."
+        static let notificationsNote = "You can disable these notifications by switching off the **Show Progress Notifications** and **Show Result Notifications** toggle."
                 
         static let launchAtLoginTitle = "Start **Mask This** automatically when you log in."
         static let launchAtLoginNote = "To enable this, simply turn on the **Launch at Login** toggle."
@@ -76,8 +76,11 @@ nonisolated struct UITexts {
         static let auto = "Mask Clipboard Automatically"
         static let autoDescription = "Sensitive information in the clipboard will be masked automatically"
         
-        static let showNotifications = "Show Notifications"
-        static let showNotificationsDescription = "Show notifications when information is masked"
+        static let showProgressNotifications = "Show Progress Notifications"
+        static let showResultNotifications = "Show Result Notifications"
+        
+        static let showProgressNotificationsDescription = "Show progress notifications when information is masking"
+        static let showResultNotificationsDescription = "Show result notifications when information is masked"
         
         static let launchAtLogin = "Launch at Login"
     }
