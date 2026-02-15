@@ -44,6 +44,7 @@ struct MaskThisApp: App {
             SettingsView()
                 .environment(scheme)
                 .environment(settingsModel)
+                .environment(clipboardManager)
         }
         
         Window(UITexts.Titles.howToUse, id: Constants.WindowID.howToUse) {
