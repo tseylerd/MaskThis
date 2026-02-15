@@ -109,10 +109,10 @@ nonisolated struct UITexts {
         struct ModelState {
             private init() { }
             
-            static let paused = "Model download paused"
+            static let paused = "Model installation paused"
             
             static func progress(_ fraction: Double) -> String {
-                return "Downloading model: \(fraction)"
+                return "Installing model: \(fraction)"
             }
         }
     }
