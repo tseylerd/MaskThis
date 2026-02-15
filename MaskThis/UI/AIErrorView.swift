@@ -7,11 +7,26 @@ struct AIErrorView: View {
     
     var body: some View {
         if case .appleIntelligenceNotEnabled = reason {
-            Label(UITexts.Statuses.Errors.appleIntelligenceNotEnabled, systemImage: scheme.warningImage)
+            Label {
+                Text(UITexts.Statuses.Errors.appleIntelligenceNotEnabled)
+                    .foregroundColor(scheme.errorTextColor)
+            } icon: {
+                Image(systemName: scheme.warningImage)
+            }
         } else if case .deviceNotEligible = reason {
-            Label(UITexts.Statuses.Errors.appleIntelligenceNotSupported, systemImage: scheme.warningImage)
+            Label {
+                Text(UITexts.Statuses.Errors.appleIntelligenceNotSupported)
+                    .foregroundColor(scheme.errorTextColor)
+            } icon: {
+                Image(systemName: scheme.warningImage)
+            }
         } else if case .modelNotReady = reason {
-            Label(UITexts.Statuses.Errors.appleIntelligenceLoading, systemImage: scheme.warningImage)
+            Label {
+                Text(UITexts.Statuses.Errors.appleIntelligenceLoading)
+                    .foregroundColor(scheme.errorTextColor)
+            } icon: {
+                Image(systemName: scheme.warningImage)
+            }
         }
     }
 }
