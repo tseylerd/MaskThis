@@ -82,6 +82,7 @@ class CustomNotificationManager {
             newWindow.level = .floating
             newWindow.ignoresMouseEvents = false
             newWindow.isReleasedWhenClosed = false
+            newWindow.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
             newWindow.center()
             
             let targetSize = hostingController.sizeThatFits(in: CGSize(width: CGFloat.infinity, height: CGFloat.infinity))
