@@ -44,6 +44,10 @@ class ClipboardManager {
         }
     }
     
+    func pullActualState() {
+        self.lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: nil)
+    }
+    
     func subscribeOnChanges() {
         self.lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: nil)
         Task.detached(priority: .background) {

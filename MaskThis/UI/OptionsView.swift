@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OptionsView: View {
     @Environment(AppSettingsModel.self) var settings
+    @Environment(ClipboardManager.self) var clipboardManager
     
     let hints: Bool
     
@@ -34,6 +35,11 @@ struct OptionsView: View {
             }
             
             Toggle(UITexts.Toggles.launchAtLogin, isOn: $settings.launchAtLogin)
+        }
+        .onChange(of: settings.auto) {
+            if settings.auto {
+                clipboardManager.pullActualState()
+            }
         }
     }
 }
