@@ -195,6 +195,10 @@ class ClipboardManager {
         var itemsToLeave: [NSPasteboardItem] = []
         var toMask: String? = nil
         for item in items {
+            guard !item.isTypeToSkip else {
+                return nil
+            }
+            
             guard item.isTextType else {
                 itemsToLeave.append(item)
                 continue
@@ -231,6 +235,16 @@ fileprivate nonisolated extension NSPasteboardItem {
         types.contains(.fileContents) ||
         types.contains(.rtf) ||
         types.contains(.tabularText)
+    }
+    
+    var isTypeToSkip: Bool {
+        types.contains(.fileURL) ||
+        types.contains(.fileContents) ||
+        types.contains(.URL) ||
+        types.contains(.pdf) ||
+        types.contains(.png) ||
+        types.contains(.sound) ||
+        types.contains(.tiff)
     }
     
     func asString() -> String? {
