@@ -98,7 +98,7 @@ nonisolated struct UITexts {
             
             static let appleIntelligenceNotEnabled = "Apple Intelligence not enabled"
             static let appleIntelligenceNotSupported = "Apple Intelligence is not supported by this device"
-            static let appleIntelligenceLoading = "Setting up Apple Intelligence"
+            static let appleIntelligenceLoading = "Apple Intelligence is not ready"
             
             static let lastError = "Last error"
             static let installationFailed = "Model installation failed"

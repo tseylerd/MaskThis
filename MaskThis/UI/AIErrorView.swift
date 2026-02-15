@@ -7,11 +7,11 @@ struct AIErrorView: View {
     
     var body: some View {
         if case .appleIntelligenceNotEnabled = reason {
-            Label(UITexts.Statuses.Errors.appleIntelligenceNotEnabled, systemImage: scheme.noImage)
+            Label(UITexts.Statuses.Errors.appleIntelligenceNotEnabled, systemImage: scheme.warningImage)
         } else if case .deviceNotEligible = reason {
             Label(UITexts.Statuses.Errors.appleIntelligenceNotSupported, systemImage: scheme.warningImage)
         } else if case .modelNotReady = reason {
-            Label(UITexts.Statuses.Errors.appleIntelligenceLoading, systemImage: scheme.progressImage)
+            Label(UITexts.Statuses.Errors.appleIntelligenceLoading, systemImage: scheme.warningImage)
         }
     }
 }
