@@ -7,12 +7,17 @@ struct HowToUseView: View {
         VStack(spacing: 18) {
             Image(nsImage: NSApplication.shared.applicationIconImage)
             
-            HStack {
+            ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     SinglePoint(data: SinglePointData(
                         image: scheme.privacyImage,
                         title: UITexts.HowToUse.privacyTitle,
                         note: UITexts.HowToUse.privacyNote
+                    ))
+                    SinglePoint(data: SinglePointData(
+                        image: scheme.limitImage,
+                        title: UITexts.HowToUse.limitTitle,
+                        note: UITexts.HowToUse.limitDescription
                     ))
                     SinglePoint(data: SinglePointData(
                         image: scheme.runInBackgroundImage,
@@ -41,8 +46,7 @@ struct HowToUseView: View {
                     ))
                     ContactUsLink()
                 }
-                Spacer()
-            }
+            }.frame(alignment: .leading)
             Spacer()
         }
     }

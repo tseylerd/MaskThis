@@ -59,7 +59,7 @@ struct MaskThisApp: App {
             HowToUseView()
                 .environment(scheme)
                 .scenePadding()
-                .fixedSize(horizontal: false, vertical: true)
         }
+        .defaultSize(width: 800, height: 800)
     }
 }

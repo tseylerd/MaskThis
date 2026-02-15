@@ -39,6 +39,10 @@ class UIScheme {
         "lock.shield"
     }
     
+    var limitImage: String {
+        "ruler.fill"
+    }
+    
     var launchAtLoginImage: String {
         "bolt.circle"
     }

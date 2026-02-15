@@ -2,9 +2,10 @@ import FoundationModels
 import Foundation
 
 actor AIInferenceEngine {
+    static let MAX_LENGTH = Util.tokensToSymbols(2048)
+    
     private static let MAX_TOKENS = 512
     private static let MAX_OUTPUT_TOKENS = 768
-    private static let MAX_LENGTH = Util.tokensToSymbols(MAX_TOKENS)
     
     private let model: SystemLanguageModel
     private let preprocessor: TextProcessor
@@ -22,14 +23,21 @@ actor AIInferenceEngine {
         }
         
         try Task.checkCancellation()
+
+        let maxSymbols = Util.tokensToSymbols(Self.MAX_TOKENS)
         
-        let session = LanguageModelSession(model: model)
-        try Task.checkCancellation()
-        
-        let localResult = try await session.respond(to: preprocessor.process(text), generating: String.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: Self.MAX_OUTPUT_TOKENS)).content
-        try Task.checkCancellation()
-        
-        return await postProcessor.process(localResult)
+        var result = ""
+        let chunks = split(text, maxSymbols)
+        for chunk in chunks {
+            let session = LanguageModelSession(model: model)
+            try Task.checkCancellation()
+            
+            let localResult = try await session.respond(to: preprocessor.process(chunk), generating: String.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: Self.MAX_OUTPUT_TOKENS)).content
+            
+            try Task.checkCancellation()
+            result += await postProcessor.process(localResult)
+        }
+        return result
     }
     
     private func split(_ text: String, _ chunkSize: Int) -> [String] {

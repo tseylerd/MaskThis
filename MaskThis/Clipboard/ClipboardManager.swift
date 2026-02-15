@@ -122,7 +122,7 @@ class ClipboardManager {
                 NotificationData(
                     title: UITexts.Notifications.maskingSensitiveInformation,
                     subtitle: nil,
-                    note: nil,
+                    note: UITexts.Notifications.maskingSensitiveInformationNote,
                     type: .info,
                     autoClose: false,
                     progress: true
@@ -251,7 +251,7 @@ class ClipboardManager {
     private func processText(_ engine: AIInferenceEngine, _ text: String) async -> String? {
         do {
             Self.LOG.info("Running AI...")
-            return try await Task.withTimeout(duration: .seconds(20)) {
+            return try await Task.withTimeout(duration: .seconds(60)) {
                 try await engine.mask(text)
             }
         } catch _ as CancellationError {

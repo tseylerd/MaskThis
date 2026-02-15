@@ -5,6 +5,7 @@ nonisolated struct UITexts {
         private init() { }
         
         static let maskingSensitiveInformation = "Masking sensitive information..."
+        static let maskingSensitiveInformationNote = "May take up to 1 minute"
         static let successfullyMasked = "Sensitive information masked"
         static let successfullyMaskedNote = "Masked by AI and may contain mistakes. Please double-check."
         static let nothingMasked = "No sensitive information found"
@@ -45,14 +46,17 @@ nonisolated struct UITexts {
         static let runsInBackgroundTitle = "The app runs in the background and is accessible via the Menu Bar."
         static let runsInBackgroundNote = "To close the app, select **Quit Mask This** in the menu."
         
-        static let modesTitle = "Choose between Auto and Manual modes. Auto is active by default. Toggle **Mask Clipboard Automatically** to switch."
-        static let modesNote = "In Auto mode, the app masks sensitive data in clipboard every time you copy. In Manual mode, use **Mask Clipboard Content** or press the shortcut (`Cmd+Shift+M` by default) to mask content in clipboard."
+        static let modesTitle = "Choose between **Auto** and **Manual** modes. Auto is active by default. Toggle **Mask Clipboard Automatically** to switch."
+        static let modesNote = "In **Auto** mode, the app masks sensitive data in clipboard every time you copy. In **Manual** mode, use **Mask Clipboard Content** or press the shortcut (`Cmd+Shift+M` by default) to mask content in clipboard."
                 
         static let notificationsTitle = "Stay informed with notifications whenever clipboard content is processing or masked."
         static let notificationsNote = "You can disable these notifications by switching off the **Show Progress Notifications** and **Show Result Notifications** toggles."
                 
         static let launchAtLoginTitle = "Start **Mask This** automatically when you log in."
         static let launchAtLoginNote = "To enable this, simply turn on the **Launch at Login** toggle."
+        
+        static let limitTitle = "Input text size is limited."
+        static let limitDescription = "Processing is limited to **\(AIInferenceEngine.MAX_LENGTH)** characters to ensure stability."
         
         static let feedbackTitle = "Feel free to reach out with any feedback."
     }
