@@ -286,7 +286,8 @@ fileprivate nonisolated extension NSPasteboardItem {
         types.contains(.pdf) ||
         types.contains(.png) ||
         types.contains(.sound) ||
-        types.contains(.tiff)
+        types.contains(.tiff) ||
+        types.contains(.html)
     }
     
     func asString() -> String? {
