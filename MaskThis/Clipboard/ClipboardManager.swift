@@ -251,9 +251,19 @@ class ClipboardManager {
     private func processText(_ engine: AIInferenceEngine, _ text: String) async -> String? {
         do {
             Self.LOG.info("Running AI...")
-            return try await engine.mask(text)
+            return try await Task.withTimeout(duration: .seconds(20)) {
+                try await engine.mask(text)
+            }
         } catch _ as CancellationError {
             Self.LOG.info("Cancelled inference")
+            return nil
+        } catch _ as TimeoutError {
+            Self.LOG.info("Timeout")
+            if settingsModel.showResultNotification {
+                _ = notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: UITexts.Statuses.Errors.timeoutWhileMasking, note: nil, type: .error, autoClose: true, progress: false) { id in
+                    self.notificationsManager.hide(id)
+                })
+            }
             return nil
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")

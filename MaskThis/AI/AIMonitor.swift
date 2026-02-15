@@ -55,7 +55,7 @@ class AIMonitor {
         lastInstantiationTry = Date()
         do {
             let model = try await modelFactory.create()
-            inference = AIInferenceEngine(model)
+            inference = await AIInferenceEngine(model)
             appModel.modelState = .ready
         } catch {
             appModel.modelState = .error(text: error.localizedDescription)

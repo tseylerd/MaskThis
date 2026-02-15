@@ -1,20 +1,19 @@
 import FoundationModels
 import Foundation
 
-@MainActor
-class AIInferenceEngine {
+actor AIInferenceEngine {
     private static let MAX_TOKENS = 512
-    private static let MAX_LENGTH = Util.tokensToSymbols(2048)
+    private static let MAX_OUTPUT_TOKENS = 768
+    private static let MAX_LENGTH = Util.tokensToSymbols(MAX_TOKENS)
     
-    let model: SystemLanguageModel
-    
+    private let model: SystemLanguageModel
     private let preprocessor: TextProcessor
     private let postProcessor: TextProcessor
     
-    init(_ model: SystemLanguageModel) {
+    init(_ model: SystemLanguageModel) async {
         self.model = model
-        self.preprocessor = InputPreprocessor()
-        self.postProcessor = OutputProcessor()
+        self.preprocessor = await InputPreprocessor()
+        self.postProcessor = await OutputProcessor()
     }
     
     func mask(_ text: String) async throws -> String {
@@ -24,20 +23,13 @@ class AIInferenceEngine {
         
         try Task.checkCancellation()
         
-        let maxSymbols = Util.tokensToSymbols(Self.MAX_TOKENS)
+        let session = LanguageModelSession(model: model)
+        try Task.checkCancellation()
         
-        var result = ""
-        let chunks = split(text, maxSymbols)
-        for chunk in chunks {
-            let session = LanguageModelSession(model: model)
-            try Task.checkCancellation()
-            
-            let localResult = try await session.respond(to: preprocessor.process(chunk), generating: String.self, options: GenerationOptions(temperature: 0.1)).content
-            
-            try Task.checkCancellation()
-            result += postProcessor.process(localResult)
-        }
-        return result
+        let localResult = try await session.respond(to: preprocessor.process(text), generating: String.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: Self.MAX_OUTPUT_TOKENS)).content
+        try Task.checkCancellation()
+        
+        return await postProcessor.process(localResult)
     }
     
     private func split(_ text: String, _ chunkSize: Int) -> [String] {

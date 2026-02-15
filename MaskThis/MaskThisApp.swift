@@ -33,7 +33,7 @@ struct MaskThisApp: App {
                 .environment(clipboardManager)
                 .onChange(of: settingsModel.showResultNotification) {
                     AppSettings.shared.showResultNotification = settingsModel.showResultNotification
-                }.onChange(of: settingsModel.showResultNotification) {
+                }.onChange(of: settingsModel.showProgressNotification) {
                     AppSettings.shared.showProgressNotification = settingsModel.showProgressNotification
                 }.onChange(of: settingsModel.auto) {
                     AppSettings.shared.auto = settingsModel.auto

@@ -54,7 +54,7 @@ open class BGAssetsBasedFactory: ModelFactory {
     }
     
     open func createModel(_ url: URL) throws -> SystemLanguageModel {
-        try SystemLanguageModel(adapter: .init(fileURL: url))
+        try SystemLanguageModel(adapter: .init(fileURL: url), guardrails: .permissiveContentTransformations)
     }
     
     private func runProgressTask() {

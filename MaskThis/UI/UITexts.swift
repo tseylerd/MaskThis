@@ -103,7 +103,8 @@ nonisolated struct UITexts {
             static let lastError = "Last error"
             static let installationFailed = "Model installation failed"
             
-            static let tooBigText = "The text is too big to be masked."
+            static let tooBigText = "Text is too big"
+            static let timeoutWhileMasking = "Timeout"
         }
         
         struct ModelState {
@@ -112,7 +113,8 @@ nonisolated struct UITexts {
             static let paused = "Model installation paused"
             
             static func progress(_ fraction: Double) -> String {
-                return "Installing model: \(fraction)"
+                let intValue = Int(fraction * 100)
+                return "Installing model: \(intValue)%"
             }
         }
     }
