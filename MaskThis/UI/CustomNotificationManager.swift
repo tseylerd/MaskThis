@@ -59,7 +59,7 @@ class CustomNotificationManager {
                 return
             }
             
-            let view = NotificationView(data: data)
+            let view = NotificationView(data: data, id: newSessionId)
                 .environment(appSettingsModel)
                 .environment(scheme)
                 .fixedSize()
@@ -80,7 +80,7 @@ class CustomNotificationManager {
             newWindow.backgroundColor = .clear
             newWindow.hasShadow = false
             newWindow.level = .floating
-            newWindow.ignoresMouseEvents = true
+            newWindow.ignoresMouseEvents = false
             newWindow.isReleasedWhenClosed = false
             newWindow.center()
             

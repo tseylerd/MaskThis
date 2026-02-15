@@ -22,13 +22,19 @@ class AIInferenceEngine {
             throw InferenceError.textIsTooBig
         }
         
+        try Task.checkCancellation()
+        
         let maxSymbols = Util.tokensToSymbols(Self.MAX_TOKENS)
         
         var result = ""
         let chunks = split(text, maxSymbols)
         for chunk in chunks {
             let session = LanguageModelSession(model: model)
+            try Task.checkCancellation()
+            
             let localResult = try await session.respond(to: preprocessor.process(chunk), generating: String.self, options: GenerationOptions(temperature: 0.1)).content
+            
+            try Task.checkCancellation()
             result += postProcessor.process(localResult)
         }
         return result

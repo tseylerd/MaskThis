@@ -14,6 +14,10 @@ class ClipboardManager {
     
     @ObservationIgnored
     private var lastState: ClipboardState?
+    @ObservationIgnored
+    private var aiTask: Task<String?, Never>?
+    @ObservationIgnored
+    private var inferenceId: UUID?
     
     var canMask: Bool {
         guard case .ready = self.model.appStatus else {
@@ -105,6 +109,8 @@ class ClipboardManager {
         
         lastState = ClipboardState(changes: newCount, string: toMask)
         
+        let myInferenceId = UUID()
+        self.inferenceId = myInferenceId
         model.appStatus = .processing
         defer {
             model.appStatus = .ready
@@ -120,11 +126,30 @@ class ClipboardManager {
                     type: .info,
                     autoClose: false,
                     progress: true
-                )
+                ) { id in
+                    if self.inferenceId == myInferenceId {
+                        self.aiTask?.cancel()
+                        self.notificationsManager.hide(id)
+                    }
+                }
             )
         }
         
-        let processedText = await self.processText(engine, toMask)
+        let task = Task(priority: .userInitiated) {
+            await self.processText(engine, toMask)
+        }
+        
+        self.aiTask = task
+        
+        let processedText = await task.value
+        
+        guard !Task.isCancelled else {
+            Self.LOG.info("Task is cancelled")
+            if let sessionId {
+                notificationsManager.hide(sessionId)
+            }
+            return
+        }
         
         guard let processedText else {
             Self.LOG.info("Processed text is nil")
@@ -142,6 +167,14 @@ class ClipboardManager {
             return
         }
         
+        guard inferenceId == myInferenceId else {
+            Self.LOG.info("New inference invoked")
+            if let sessionId {
+                notificationsManager.hide(sessionId)
+            }
+            return
+        }
+        
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
             if settingsModel.showResultNotification {
@@ -152,8 +185,10 @@ class ClipboardManager {
                         note: nil,
                         type: .info,
                         autoClose: true,
-                        progress: false
-                    )
+                        progress: false,
+                    ) { id in
+                        self.notificationsManager.hide(id)
+                    }
                 )
             } else if let sessionId {
                 notificationsManager.hide(sessionId)
@@ -182,7 +217,9 @@ class ClipboardManager {
                     type: .info,
                     autoClose: true,
                     progress: false
-                )
+                ) { id in
+                    self.notificationsManager.hide(id)
+                }
             )
         }
     }
@@ -215,10 +252,15 @@ class ClipboardManager {
         do {
             Self.LOG.info("Running AI...")
             return try await engine.mask(text)
+        } catch _ as CancellationError {
+            Self.LOG.info("Cancelled inference")
+            return nil
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")
             if settingsModel.showResultNotification {
-                _ = notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false))
+                _ = notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false) { id in
+                    self.notificationsManager.hide(id)
+                })
             }
             await MainActor.run {
                 model.lastError = error.localizedDescription

@@ -4,6 +4,7 @@ struct NotificationView: View {
     @Environment(UIScheme.self) var scheme
     
     let data: NotificationData
+    let id: UUID
     
     var backgroundColor: Color {
         switch data.type {
@@ -36,34 +37,47 @@ struct NotificationView: View {
     }
     
     var body: some View {
-        VStack(alignment: .center) {
-            if data.progress {
-                HStack {
-                    ProgressView()
-                        .font(.title.weight(titleWeight))
-                    Text(data.title)
+        HStack {
+            VStack(alignment: .center) {
+                if data.progress {
+                    HStack {
+                        ProgressView()
+                            .font(.title.weight(titleWeight))
+                        Text(data.title)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .font(.title.weight(titleWeight))
+                    }
+                } else {
+                    Label(data.title, systemImage: image)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .font(.title.weight(titleWeight))
                 }
-            } else {
-                Label(data.title, systemImage: image)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .font(.title.weight(titleWeight))
+                
+                if let subtitle = data.subtitle {
+                    Text(subtitle)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .font(.title.weight(.light))
+                }
+                
+                if let note = data.note {
+                    Text(note)
+                        .foregroundStyle(.secondary)
+                        .font(.footnote)
+                }
             }
             
-            if let subtitle = data.subtitle {
-                Text(subtitle)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .font(.title.weight(.light))
-            }
-            
-            if let note = data.note {
-                Text(note)
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
+            if let action = data.action {
+                Button {
+                    action(id)
+                } label: {
+                    Image(systemName: "xmark.circle")
+                        .foregroundStyle(.secondary)
+                        .font(.title.weight(titleWeight))
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding()
@@ -79,7 +93,10 @@ struct NotificationData {
     let type: NotificationType
     let autoClose: Bool
     let progress: Bool
+    let action: NotificationAction?
 }
+
+typealias NotificationAction = @MainActor (UUID) -> Void
 
 enum NotificationType {
     case info
