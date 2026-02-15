@@ -37,6 +37,13 @@ enum AppStatus {
 enum AppleIntelligenceStatus {
     case ready
     case unavailable(reason: SystemLanguageModel.Availability.UnavailableReason)
+    
+    var isReady: Bool {
+        if case .ready = self {
+            return true
+        }
+        return false
+    }
 }
 
 enum ModelState {

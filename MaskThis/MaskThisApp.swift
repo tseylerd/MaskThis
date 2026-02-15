@@ -37,6 +37,14 @@ struct MaskThisApp: App {
                     AppSettings.shared.showProgressNotification = settingsModel.showProgressNotification
                 }.onChange(of: settingsModel.auto) {
                     AppSettings.shared.auto = settingsModel.auto
+                }.onChange(of: appModel.modelState.isReady) {
+                    if appModel.modelState.isReady {
+                        clipboardManager.pullActualState()
+                    }
+                }.onChange(of: appModel.aiStatus.isReady) {
+                    if appModel.aiStatus.isReady {
+                        clipboardManager.pullActualState()
+                    }
                 }
         }
         
