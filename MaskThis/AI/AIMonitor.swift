@@ -9,6 +9,9 @@ class AIMonitor {
     
     var inference: AIInferenceEngine?
     
+    @ObservationIgnored
+    private var lastInstantiationTry: Date? = nil
+    
     init(_ appModel: AppModel, _ modelFactory: ModelFactory) {
         self.appModel = appModel
         self.modelFactory = modelFactory
@@ -43,6 +46,13 @@ class AIMonitor {
             return
         }
         
+        if let lastInstantiationTry {
+            guard Date().timeIntervalSince1970 - lastInstantiationTry.timeIntervalSince1970 > 20 else {
+                return
+            }
+        }
+        
+        lastInstantiationTry = Date()
         do {
             let model = try await modelFactory.create()
             inference = AIInferenceEngine(model)
