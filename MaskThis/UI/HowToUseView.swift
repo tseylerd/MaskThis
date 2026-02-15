@@ -56,19 +56,19 @@ fileprivate struct SinglePoint: View {
     let data: SinglePointData
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Label {
+        Label {
+            VStack(alignment: .leading) {
                 Text((try? AttributedString(markdown: data.title)) ?? AttributedString(data.title))
-            } icon: {
-                Image(systemName: data.image)
-            }
-            .font(.title3)
-            .multilineTextAlignment(.leading)
-            
-            if let note = data.note {
-                Text((try? AttributedString(markdown: note)) ?? AttributedString(note))
+                    .font(.headline)
                     .multilineTextAlignment(.leading)
+                if let note = data.note {
+                    Text((try? AttributedString(markdown: note)) ?? AttributedString(note))
+                        .multilineTextAlignment(.leading)
+                }
             }
+        } icon: {
+            Image(systemName: data.image)
+                .font(.headline)
         }
     }
 }

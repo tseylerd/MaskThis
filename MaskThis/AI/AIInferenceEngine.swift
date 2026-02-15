@@ -2,7 +2,7 @@ import FoundationModels
 import Foundation
 
 actor AIInferenceEngine {
-    static let MAX_LENGTH = Util.tokensToSymbols(2048)
+    static nonisolated let MAX_LENGTH = Util.tokensToSymbols(2048)
     
     private static let MAX_TOKENS = 512
     private static let MAX_OUTPUT_TOKENS = 768
