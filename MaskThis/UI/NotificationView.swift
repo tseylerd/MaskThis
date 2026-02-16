@@ -38,22 +38,20 @@ struct NotificationView: View {
     
     var body: some View {
         HStack {
+            if data.progress {
+                ProgressView()
+                    .font(.title.weight(titleWeight))
+            } else {
+                Image(systemName: image)
+                    .foregroundStyle(.secondary)
+                    .font(.title.weight(titleWeight))
+            }
+            
             VStack(alignment: .center) {
-                if data.progress {
-                    HStack {
-                        ProgressView()
-                            .font(.title.weight(titleWeight))
-                        Text(data.title)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                            .font(.title.weight(titleWeight))
-                    }
-                } else {
-                    Label(data.title, systemImage: image)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .font(.title.weight(titleWeight))
-                }
+                Text(data.title)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .font(.title.weight(titleWeight))
                 
                 if let subtitle = data.subtitle {
                     Text(subtitle)
