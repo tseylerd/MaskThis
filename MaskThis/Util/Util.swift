@@ -21,20 +21,30 @@ extension Task where Success == Never, Failure == Never {
         duration: Duration,
         operation: @escaping @Sendable () async throws -> T
     ) async throws -> T? {
+        let mainTask: Task<T, Error> = Task<T, Error>.detached {
+            try await operation()
+        }
+        
         return try await withThrowingTaskGroup(of: T.self) { group in
             group.addTask {
-                return try await operation()
+                try await mainTask.value
             }
             group.addTask {
-                await Util.delay(duration)
+                try await Task.sleep(for: duration)
                 throw TimeoutError()
             }
             
-            let result = try await group.next()
-            
-            group.cancelAll()
-            
-            return result
+            do {
+                let result = try await group.next()
+                
+                group.cancelAll()
+                
+                return result
+            } catch {
+                group.cancelAll()
+                mainTask.cancel()
+                throw error
+            }
         }
     }
 }
