@@ -221,6 +221,8 @@ class ClipboardManager {
                     self.notificationsManager.hide(id)
                 }
             )
+        } else if let sessionId {
+            notificationsManager.hide(sessionId)
         }
     }
     
