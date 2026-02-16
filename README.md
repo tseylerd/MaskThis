@@ -21,4 +21,5 @@
 4.  The masked text is written back to your clipboard.
 
 ### Demo
-[Demo](https://github.com/user-attachments/assets/962ca08f-dd6b-4b4c-bbd5-9cdea6e9dd8)
+<video src="https://github.com/user-attachments/assets/962ca08f-dd6b-4b4c-bbd5-9cdea6e9dd8" controls width="600">
+</video>
