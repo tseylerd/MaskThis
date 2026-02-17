@@ -63,14 +63,22 @@ class ClipboardManager {
                     continue
                 }
                 
-                if let duration = await self.maskClipboard() {
+                if let duration = await self.maskClipboardTry() {
                     await Util.delay(duration)
                 }
             }
         }
     }
     
-    func maskClipboard() async -> Duration? {
+    func maskClipboard() async {
+        _ = await self.maskClipboardInternal(RequestedMaskingStrategy(), NotificationsStrategy(settingsModel, notificationsManager, true, true))
+    }
+    
+    private func maskClipboardTry() async -> Duration? {
+        return await self.maskClipboardInternal(AutoMaskingStrategy(), NotificationsStrategy(settingsModel, notificationsManager, false, false))
+    }
+    
+    private func maskClipboardInternal(_ maskingStrategy: MaskingStrategy, _ notificationsStrategy: NotificationsStrategy) async -> Duration? {
         guard canMask else {
             Self.LOG.info("App is not ready")
             return .seconds(1)
@@ -81,16 +89,17 @@ class ClipboardManager {
             return .seconds(1)
         }
         
-        await self.processClipboard(engine)
+        await self.processClipboard(engine, maskingStrategy, notificationsStrategy)
         return nil
     }
     
-    private func processClipboard(_ engine: AIInferenceEngine) async {
-        let newCount = NSPasteboard.general.changeCount
-        guard newCount != lastState?.changes else {
+    private func processClipboard(_ engine: AIInferenceEngine, _ maskingStrategy: MaskingStrategy, _ notificationsStrategy: NotificationsStrategy) async {
+        guard let checkpoint = maskingStrategy.acquire(lastState) else {
+            Self.LOG.info("Strategy: \(maskingStrategy.id), decided not to mask")
             return
         }
 
+        let newCount = checkpoint.currentChangeCount
         Self.LOG.info("Processing clipboard on change count: \(newCount)")
 
         model.lastError = nil
@@ -98,10 +107,11 @@ class ClipboardManager {
         guard let (toMask, toLeave) = findTextToMask(), let toMask else {
             Self.LOG.info("Failed to find text in clipboard")
             lastState = ClipboardState(changes: newCount, string: nil)
+            notificationsStrategy.showNoTextFound()
             return
         }
 
-        guard lastState?.string != toMask else {
+        guard maskingStrategy.makesSenseToMask(lastState, toMask) else {
             lastState = ClipboardState(changes: newCount, string: toMask)
             Self.LOG.info("Text is not changed")
             return
@@ -116,83 +126,68 @@ class ClipboardManager {
             model.appStatus = .ready
         }
         
-        var sessionId: UUID? = nil
-        if settingsModel.showProgressNotification {
-            sessionId = notificationsManager.show(
-                NotificationData(
-                    title: UITexts.Notifications.maskingSensitiveInformation,
-                    subtitle: nil,
-                    note: UITexts.Notifications.maskingSensitiveInformationNote,
-                    type: .info,
-                    autoClose: false,
-                    progress: true
-                ) { id in
-                    if self.inferenceId == myInferenceId {
-                        self.aiTask?.cancel()
-                        self.notificationsManager.hide(id)
-                    }
-                }
-            )
-        }
+        let notificationLifetime = notificationsStrategy.showProgress(NotificationData(
+            title: UITexts.Notifications.maskingSensitiveInformation,
+            subtitle: nil,
+            note: UITexts.Notifications.maskingSensitiveInformationNote,
+            type: .info,
+            autoClose: false,
+            progress: true
+        ) { id in
+            if self.inferenceId == myInferenceId {
+                self.aiTask?.cancel()
+                self.notificationsManager.hide(id)
+            }
+        })
         
         let task = Task(priority: .userInitiated) {
-            await self.processText(engine, toMask)
+            await self.processText(engine, toMask, notificationsStrategy)
         }
         
         self.aiTask = task
         
-        let processedText = await task.value
+        let processedText: String? = await task.value
         
         guard !Task.isCancelled else {
             Self.LOG.info("Task is cancelled")
-            if let sessionId {
-                notificationsManager.hide(sessionId)
-            }
+            notificationLifetime?.close()
             return
         }
         
         guard let processedText else {
             Self.LOG.info("Processed text is nil")
-            if let sessionId {
-                notificationsManager.hide(sessionId)
-            }
+            notificationLifetime?.close()
             return
         }
         
         if let (currentTextToMask, _) = findTextToMask(), currentTextToMask != toMask {
             Self.LOG.info("Text changed while processing")
-            if let sessionId {
-                notificationsManager.hide(sessionId)
-            }
+            notificationsStrategy.showTextChange()
+            notificationLifetime?.close()
             return
         }
         
         guard inferenceId == myInferenceId else {
             Self.LOG.info("New inference invoked")
-            if let sessionId {
-                notificationsManager.hide(sessionId)
-            }
+            notificationLifetime?.close()
             return
         }
         
         guard processedText.trimmingCharacters(in: .whitespacesAndNewlines) != toMask.trimmingCharacters(in: .whitespacesAndNewlines) else {
             Self.LOG.info("Text wasn't masked")
-            if settingsModel.showResultNotification {
-                _ = notificationsManager.show(
-                    NotificationData(
-                        title: UITexts.Notifications.nothingMasked,
-                        subtitle: nil,
-                        note: nil,
-                        type: .info,
-                        autoClose: true,
-                        progress: false,
-                    ) { id in
-                        self.notificationsManager.hide(id)
-                    }
-                )
-            } else if let sessionId {
-                notificationsManager.hide(sessionId)
-            }
+            _ = notificationsStrategy.showResult(
+                NotificationData(
+                    title: UITexts.Notifications.nothingMasked,
+                    subtitle: nil,
+                    note: nil,
+                    type: .info,
+                    autoClose: true,
+                    progress: false,
+                ) { id in
+                    self.notificationsManager.hide(id)
+                }
+            )
+            notificationLifetime?.close()
             return
         }
         
@@ -205,25 +200,22 @@ class ClipboardManager {
         
         NSPasteboard.general.clearContents()
         NSPasteboard.general.writeObjects(newItems)
-
+        
         lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: processedText)
         
-        if settingsModel.showResultNotification {
-            _ = notificationsManager.show(
-                NotificationData(
-                    title: UITexts.Notifications.successfullyMasked,
-                    subtitle: nil,
-                    note: UITexts.Notifications.successfullyMaskedNote,
-                    type: .info,
-                    autoClose: true,
-                    progress: false
-                ) { id in
-                    self.notificationsManager.hide(id)
-                }
-            )
-        } else if let sessionId {
-            notificationsManager.hide(sessionId)
-        }
+        _ = notificationsStrategy.showResult(
+            NotificationData(
+                title: UITexts.Notifications.successfullyMasked,
+                subtitle: nil,
+                note: UITexts.Notifications.successfullyMaskedNote,
+                type: .info,
+                autoClose: true,
+                progress: false
+            ) { id in
+                self.notificationsManager.hide(id)
+            }
+        )
+        notificationLifetime?.close()
     }
     
     private nonisolated func findTextToMask() -> (String?, [NSPasteboardItem])? {
@@ -250,7 +242,7 @@ class ClipboardManager {
         return (toMask, itemsToLeave)
     }
     
-    private func processText(_ engine: AIInferenceEngine, _ text: String) async -> String? {
+    private func processText(_ engine: AIInferenceEngine, _ text: String, _ notificationsStrategy: NotificationsStrategy) async -> String? {
         do {
             Self.LOG.info("Running AI...")
             return try await Task.withTimeout(duration: .seconds(60)) {
@@ -261,19 +253,17 @@ class ClipboardManager {
             return nil
         } catch _ as TimeoutError {
             Self.LOG.info("Timeout")
-            if settingsModel.showResultNotification {
-                _ = notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: UITexts.Statuses.Errors.timeoutWhileMasking, note: nil, type: .error, autoClose: true, progress: false) { id in
+            _ = notificationsStrategy.showResult(
+                NotificationData(title: UITexts.Notifications.error, subtitle: UITexts.Statuses.Errors.timeoutWhileMasking, note: nil, type: .error, autoClose: true, progress: false) { id in
                     self.notificationsManager.hide(id)
-                })
-            }
+                }
+            )
             return nil
         } catch {
             Self.LOG.error("Error sanitizing text: \(error.localizedDescription)")
-            if settingsModel.showResultNotification {
-                _ = notificationsManager.show(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false) { id in
-                    self.notificationsManager.hide(id)
-                })
-            }
+            _ = notificationsStrategy.showResult(NotificationData(title: UITexts.Notifications.error, subtitle: error.localizedDescription, note: nil, type: .error, autoClose: true, progress: false) { id in
+                self.notificationsManager.hide(id)
+            })
             await MainActor.run {
                 model.lastError = error.localizedDescription
             }
@@ -317,4 +307,116 @@ fileprivate nonisolated extension NSPasteboardItem {
 fileprivate struct ClipboardState {
     let changes: Int
     let string: String?
+}
+
+fileprivate protocol MaskingStrategy {
+    var id: String {
+        get
+    }
+    
+    func acquire(_ state: ClipboardState?) -> (any MaskingCheckpoint)?
+    func makesSenseToMask(_ state: ClipboardState?, _ newText: String) -> Bool
+}
+
+fileprivate protocol MaskingCheckpoint {
+    var currentChangeCount: Int {
+        get
+    }
+}
+
+fileprivate class AutoMaskingStrategy: MaskingStrategy {
+    var id: String = "Auto"
+    
+    func acquire(_ state: ClipboardState?) -> (any MaskingCheckpoint)? {
+        let newCount = NSPasteboard.general.changeCount
+        return newCount != state?.changes ? MaskingCheckpointImpl(currentChangeCount: newCount) : nil
+    }
+    
+    func makesSenseToMask(_ state: ClipboardState?, _ newText: String) -> Bool {
+        return state?.string != newText
+    }
+}
+
+fileprivate class RequestedMaskingStrategy: MaskingStrategy {
+    var id: String = "Requested"
+    
+    func acquire(_ state: ClipboardState?) -> (any MaskingCheckpoint)? {
+        return MaskingCheckpointImpl(currentChangeCount: NSPasteboard.general.changeCount)
+    }
+    
+    func makesSenseToMask(_ state: ClipboardState?, _ newText: String) -> Bool {
+        true
+    }
+}
+
+fileprivate struct MaskingCheckpointImpl: MaskingCheckpoint {
+    var currentChangeCount: Int
+}
+
+fileprivate class NotificationsStrategy {
+    private let settings: AppSettingsModel
+    private let manager: CustomNotificationManager
+    private let isShowNoText: Bool
+    private let isShowTextChanged: Bool
+    
+    init(_ settings: AppSettingsModel, _ manager: CustomNotificationManager, _ showNoTextFound: Bool, _ showTextChanged: Bool) {
+        self.settings = settings
+        self.manager = manager
+        self.isShowNoText = showNoTextFound
+        self.isShowTextChanged = showTextChanged
+    }
+    
+    func showTextChange() {
+        guard isShowTextChanged else {
+            return
+        }
+        
+        let data = NotificationData(
+            title: UITexts.Notifications.textChanged,
+            subtitle: nil,
+            note: nil,
+            type: .info,
+            autoClose: true,
+            progress: false
+        ) { id in
+            self.manager.hide(id)
+        }
+        
+        _ = manager.show(data)
+    }
+    
+    func showNoTextFound() {
+        guard isShowNoText else {
+            return
+        }
+        
+        let data = NotificationData(
+            title: UITexts.Notifications.noTextFound,
+            subtitle: nil,
+            note: nil,
+            type: .info,
+            autoClose: true,
+            progress: false
+        ) { id in
+            self.manager.hide(id)
+        }
+        
+        _ = manager.show(data)
+    }
+    
+    func showProgress(_ data: NotificationData) -> NotificationLifetime? {
+        guard settings.showProgressNotification else {
+            return nil
+        }
+        
+        return manager.show(data)
+    }
+    
+    func showResult(_ data: NotificationData) -> NotificationLifetime? {
+        guard settings.showResultNotification else {
+            return nil
+        }
+        
+        return manager.show(data)
+    }
 }

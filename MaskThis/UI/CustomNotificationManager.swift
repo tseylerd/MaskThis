@@ -47,7 +47,7 @@ class CustomNotificationManager {
         }
     }
     
-    func show(_ data: NotificationData) -> UUID {
+    func show(_ data: NotificationData) -> NotificationLifetime {
         window?.close()
         window = nil
         
@@ -118,7 +118,7 @@ class CustomNotificationManager {
             
         }
         
-        return newSessionId
+        return OurNotificationLifetime(self, newSessionId)
     }
     
     private func calculatePosition(relativeTo size: CGSize) -> NSPoint? {
@@ -129,5 +129,23 @@ class CustomNotificationManager {
         let x = screenRect.midX - (size.width / 2)
         let y = screenRect.minY + 100
         return NSPoint(x: x, y: y)
+    }
+}
+
+protocol NotificationLifetime {
+    func close()
+}
+
+fileprivate class OurNotificationLifetime: NotificationLifetime {
+    private let id: UUID
+    private let notificationManager: CustomNotificationManager
+    
+    init(_ notificationManager: CustomNotificationManager, _ id: UUID) {
+        self.id = id
+        self.notificationManager = notificationManager
+    }
+    
+    func close() {
+        notificationManager.hide(id)
     }
 }

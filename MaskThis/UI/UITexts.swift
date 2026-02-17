@@ -10,6 +10,8 @@ nonisolated struct UITexts {
         static let successfullyMaskedNote = "Masked by AI and may contain mistakes. Please double-check."
         static let nothingMasked = "No sensitive information found"
         static let error = "Masking failed"
+        static let noTextFound = "No text found in clipboard"
+        static let textChanged = "Clipboard content changed"
     }
     
     struct Titles {
