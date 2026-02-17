@@ -97,7 +97,6 @@ class ClipboardManager {
     
     private func processClipboard(_ engine: AIInferenceEngine, _ maskingStrategy: MaskingStrategy, _ notificationsStrategy: NotificationsStrategy) async {
         guard let checkpoint = maskingStrategy.acquire(lastState) else {
-            Self.LOG.info("Strategy: \(maskingStrategy.id), decided not to mask")
             return
         }
 
