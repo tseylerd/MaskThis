@@ -48,7 +48,7 @@ nonisolated struct UITexts {
         static let runsInBackgroundTitle = "The app runs in the background and is accessible via the Menu Bar."
         static let runsInBackgroundNote = "To close the app, select **Quit Mask This** in the menu."
         
-        static let modesTitle = "Choose between **Auto** and **Manual** modes. Auto is active by default. Toggle **Mask Clipboard Automatically** to switch."
+        static let modesTitle = "Choose between **Auto** and **Manual** modes. **Manual** is active by default. Toggle **Mask Clipboard Automatically** to switch."
         static let modesNote = "In **Auto** mode, the app masks sensitive data in clipboard every time you copy. In **Manual** mode, use **Mask Clipboard Content** or press the shortcut (`Cmd+Shift+M` by default) to mask content in clipboard."
                 
         static let notificationsTitle = "Stay informed with notifications whenever clipboard content is processing or masked."
