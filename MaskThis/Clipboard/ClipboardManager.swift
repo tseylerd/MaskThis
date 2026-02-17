@@ -18,6 +18,8 @@ class ClipboardManager {
     private var aiTask: Task<String?, Never>?
     @ObservationIgnored
     private var inferenceId: UUID?
+    @ObservationIgnored
+    private var mainTask: Task<Void, Never>?
     
     var canMask: Bool {
         guard case .ready = self.model.appStatus else {
@@ -54,8 +56,8 @@ class ClipboardManager {
     
     func subscribeOnChanges() {
         self.lastState = ClipboardState(changes: NSPasteboard.general.changeCount, string: nil)
-        Task.detached(priority: .background) {
-            while true {
+        mainTask = Task.detached(priority: .background) {
+            while !Task.isCancelled {
                 await Util.delay(.milliseconds(500))
                 
                 guard await self.settingsModel.auto else {
@@ -148,7 +150,7 @@ class ClipboardManager {
         
         let processedText: String? = await task.value
         
-        guard !Task.isCancelled else {
+        guard !task.isCancelled else {
             Self.LOG.info("Task is cancelled")
             notificationLifetime?.close()
             return
@@ -276,7 +278,6 @@ fileprivate nonisolated extension NSPasteboardItem {
     var isTextType: Bool {
         types.contains(.string) ||
         types.contains(.html) ||
-        types.contains(.fileContents) ||
         types.contains(.rtf) ||
         types.contains(.tabularText)
     }
