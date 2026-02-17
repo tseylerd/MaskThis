@@ -8,5 +8,5 @@ class AppSettings {
     
     @AppStorage("show.progress.notification") var showProgressNotification: Bool = true
     @AppStorage("show.result.notification") var showResultNotification: Bool = true
-    @AppStorage("auto") var auto: Bool = true
+    @AppStorage("auto") var auto: Bool = false
 }
