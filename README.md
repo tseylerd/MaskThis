@@ -16,9 +16,9 @@
 
 ### How it Works
 
-1.  The app runs in the background and monitors the system clipboard for changes.
-2.  When a new text is copied, the app uses an AI to process the text and mask sensitive information.
-4.  The masked text is written back to your clipboard.
+1. The app runs in the background and monitors the system clipboard for changes.
+2. When a new text is copied, the app uses an AI to process the text and mask sensitive information.
+3. The masked text is written back to your clipboard.
 
 ### Demo
 
