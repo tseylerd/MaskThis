@@ -35,14 +35,13 @@ open class BGAssetsBasedFactory: ModelFactory {
     
     func create() async throws -> SystemLanguageModel {
         Self.LOG.info("Creating system model instance")
-        
+
         let assetPack = try await AssetPackManager.shared.assetPack(withID: assetsId)
         
         runProgressTask()
         
         try await AssetPackManager.shared.ensureLocalAvailability(of: assetPack)
         
-        progressTask?.cancel()
         progressTask = nil
         
         let adapterUrl = try await Task.detached(priority: .high) {

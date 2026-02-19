@@ -7,17 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		28017E742F3E03DB00CC7E13 /* Mask This Model Adapter.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 28017E6C2F3E03DB00CC7E13 /* Mask This Model Adapter.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2863B0522F47D0D500C43927 /* MaskThisDownloader.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 2863B04A2F47D0D500C43927 /* MaskThisDownloader.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		28CE50A12F3FF14200E78D79 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 28CE50A02F3FF14200E78D79 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		28017E722F3E03DB00CC7E13 /* PBXContainerItemProxy */ = {
+		2863B0502F47D0D500C43927 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 286E73162EE722BE00E7EA54 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 28017E6B2F3E03DB00CC7E13;
-			remoteInfo = "Mask This Model Adapter";
+			remoteGlobalIDString = 2863B0492F47D0D500C43927;
+			remoteInfo = MaskThisDownloader;
 		};
 		28A259F22F3BA21400BA6BF5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -35,7 +35,7 @@
 			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
 			dstSubfolderSpec = 16;
 			files = (
-				28017E742F3E03DB00CC7E13 /* Mask This Model Adapter.appex in Embed ExtensionKit Extensions */,
+				2863B0522F47D0D500C43927 /* MaskThisDownloader.appex in Embed ExtensionKit Extensions */,
 			);
 			name = "Embed ExtensionKit Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,19 +43,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		28017E6C2F3E03DB00CC7E13 /* Mask This Model Adapter.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = "Mask This Model Adapter.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2863B04A2F47D0D500C43927 /* MaskThisDownloader.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = MaskThisDownloader.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		286E731E2EE722BE00E7EA54 /* MaskThis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MaskThis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		28A259EE2F3BA21400BA6BF5 /* MaskThisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MaskThisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		28017E752F3E03DB00CC7E13 /* Exceptions for "Mask This Model Adapter" folder in "Mask This Model Adapter" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 28017E6B2F3E03DB00CC7E13 /* Mask This Model Adapter */;
-		};
 		28017E7D2F3E050800CC7E13 /* Exceptions for "MaskThis" folder in "MaskThis" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -63,15 +56,22 @@
 			);
 			target = 286E731D2EE722BE00E7EA54 /* MaskThis */;
 		};
+		2863B0562F47D0D500C43927 /* Exceptions for "MaskThisDownloader" folder in "MaskThisDownloader" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2863B0492F47D0D500C43927 /* MaskThisDownloader */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		28017E6D2F3E03DB00CC7E13 /* Mask This Model Adapter */ = {
+		2863B04B2F47D0D500C43927 /* MaskThisDownloader */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				28017E752F3E03DB00CC7E13 /* Exceptions for "Mask This Model Adapter" folder in "Mask This Model Adapter" target */,
+				2863B0562F47D0D500C43927 /* Exceptions for "MaskThisDownloader" folder in "MaskThisDownloader" target */,
 			);
-			path = "Mask This Model Adapter";
+			path = MaskThisDownloader;
 			sourceTree = "<group>";
 		};
 		286E73202EE722BE00E7EA54 /* MaskThis */ = {
@@ -90,7 +90,7 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		28017E692F3E03DB00CC7E13 /* Frameworks */ = {
+		2863B0472F47D0D500C43927 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -120,7 +120,7 @@
 			children = (
 				286E73202EE722BE00E7EA54 /* MaskThis */,
 				28A259EF2F3BA21400BA6BF5 /* MaskThisTests */,
-				28017E6D2F3E03DB00CC7E13 /* Mask This Model Adapter */,
+				2863B04B2F47D0D500C43927 /* MaskThisDownloader */,
 				286E731F2EE722BE00E7EA54 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,7 +130,7 @@
 			children = (
 				286E731E2EE722BE00E7EA54 /* MaskThis.app */,
 				28A259EE2F3BA21400BA6BF5 /* MaskThisTests.xctest */,
-				28017E6C2F3E03DB00CC7E13 /* Mask This Model Adapter.appex */,
+				2863B04A2F47D0D500C43927 /* MaskThisDownloader.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,26 +138,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		28017E6B2F3E03DB00CC7E13 /* Mask This Model Adapter */ = {
+		2863B0492F47D0D500C43927 /* MaskThisDownloader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 28017E762F3E03DB00CC7E13 /* Build configuration list for PBXNativeTarget "Mask This Model Adapter" */;
+			buildConfigurationList = 2863B0532F47D0D500C43927 /* Build configuration list for PBXNativeTarget "MaskThisDownloader" */;
 			buildPhases = (
-				28017E682F3E03DB00CC7E13 /* Sources */,
-				28017E692F3E03DB00CC7E13 /* Frameworks */,
-				28017E6A2F3E03DB00CC7E13 /* Resources */,
+				2863B0462F47D0D500C43927 /* Sources */,
+				2863B0472F47D0D500C43927 /* Frameworks */,
+				2863B0482F47D0D500C43927 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				28017E6D2F3E03DB00CC7E13 /* Mask This Model Adapter */,
+				2863B04B2F47D0D500C43927 /* MaskThisDownloader */,
 			);
-			name = "Mask This Model Adapter";
+			name = MaskThisDownloader;
 			packageProductDependencies = (
 			);
-			productName = "Mask This Model Adapter";
-			productReference = 28017E6C2F3E03DB00CC7E13 /* Mask This Model Adapter.appex */;
+			productName = MaskThisDownloader;
+			productReference = 2863B04A2F47D0D500C43927 /* MaskThisDownloader.appex */;
 			productType = "com.apple.product-type.extensionkit-extension";
 		};
 		286E731D2EE722BE00E7EA54 /* MaskThis */ = {
@@ -172,7 +172,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				28017E732F3E03DB00CC7E13 /* PBXTargetDependency */,
+				2863B0512F47D0D500C43927 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				286E73202EE722BE00E7EA54 /* MaskThis */,
@@ -215,11 +215,11 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					28017E6B2F3E03DB00CC7E13 = {
-						CreatedOnToolsVersion = 26.0;
+					2863B0492F47D0D500C43927 = {
+						CreatedOnToolsVersion = 26.2;
 					};
 					286E731D2EE722BE00E7EA54 = {
 						CreatedOnToolsVersion = 26.0;
@@ -249,13 +249,13 @@
 			targets = (
 				286E731D2EE722BE00E7EA54 /* MaskThis */,
 				28A259ED2F3BA21400BA6BF5 /* MaskThisTests */,
-				28017E6B2F3E03DB00CC7E13 /* Mask This Model Adapter */,
+				2863B0492F47D0D500C43927 /* MaskThisDownloader */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		28017E6A2F3E03DB00CC7E13 /* Resources */ = {
+		2863B0482F47D0D500C43927 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -279,7 +279,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		28017E682F3E03DB00CC7E13 /* Sources */ = {
+		2863B0462F47D0D500C43927 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -303,10 +303,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		28017E732F3E03DB00CC7E13 /* PBXTargetDependency */ = {
+		2863B0512F47D0D500C43927 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 28017E6B2F3E03DB00CC7E13 /* Mask This Model Adapter */;
-			targetProxy = 28017E722F3E03DB00CC7E13 /* PBXContainerItemProxy */;
+			target = 2863B0492F47D0D500C43927 /* MaskThisDownloader */;
+			targetProxy = 2863B0502F47D0D500C43927 /* PBXContainerItemProxy */;
 		};
 		28A259F32F3BA21400BA6BF5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -316,27 +316,27 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		28017E772F3E03DB00CC7E13 /* Debug */ = {
+		2863B0542F47D0D500C43927 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "Mask This Model Adapter/Mask This Model Adapter.entitlements";
+				CODE_SIGN_ENTITLEMENTS = MaskThisDownloader/MaskThisDownloader.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LZ7PH84ZFG;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Mask This Model Adapter/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Mask This Model Adapter";
+				INFOPLIST_FILE = MaskThisDownloader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MaskThisDownloader;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tseiler.MaskThis.Mask-This-Model-Adapter";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tseiler.MaskThis.MaskThisDownloader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SKIP_INSTALL = YES;
@@ -348,27 +348,27 @@
 			};
 			name = Debug;
 		};
-		28017E782F3E03DB00CC7E13 /* Release */ = {
+		2863B0552F47D0D500C43927 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "Mask This Model Adapter/Mask This Model Adapter.entitlements";
+				CODE_SIGN_ENTITLEMENTS = MaskThisDownloader/MaskThisDownloader.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LZ7PH84ZFG;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Mask This Model Adapter/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Mask This Model Adapter";
+				INFOPLIST_FILE = MaskThisDownloader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MaskThisDownloader;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tseiler.MaskThis.Mask-This-Model-Adapter";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tseiler.MaskThis.MaskThisDownloader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SKIP_INSTALL = YES;
@@ -641,11 +641,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		28017E762F3E03DB00CC7E13 /* Build configuration list for PBXNativeTarget "Mask This Model Adapter" */ = {
+		2863B0532F47D0D500C43927 /* Build configuration list for PBXNativeTarget "MaskThisDownloader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				28017E772F3E03DB00CC7E13 /* Debug */,
-				28017E782F3E03DB00CC7E13 /* Release */,
+				2863B0542F47D0D500C43927 /* Debug */,
+				2863B0552F47D0D500C43927 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

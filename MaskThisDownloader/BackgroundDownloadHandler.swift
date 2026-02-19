@@ -5,6 +5,6 @@ import StoreKit
 @main
 struct DownloaderExtension: StoreDownloaderExtension {
     func shouldDownload(_ assetPack: AssetPack) -> Bool {
-        return true
+         return true
     }
 }
