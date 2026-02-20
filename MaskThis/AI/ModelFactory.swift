@@ -65,7 +65,6 @@ open class BGAssetsBasedFactory: ModelFactory {
                         stopTimeout()
                         throw error
                     case .paused(_):
-                        stopTimeout()
                         await self.updateModelState(.paused)
                     case .finished(_):
                         stopTimeout()
