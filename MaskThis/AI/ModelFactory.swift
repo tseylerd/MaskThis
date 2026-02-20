@@ -43,26 +43,22 @@ open class BGAssetsBasedFactory: ModelFactory {
         
         let adapter = try SystemLanguageModel.Adapter(name: name)
         
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, any Error>) in
-            Task.detached(priority: .high) {
-                let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
-                for try await statusUpdate in statusUpdates {
-                    switch statusUpdate {
-                    case .began(_):
-                        await self.updateModelState(.downloading(fraction: 0))
-                    case .downloading(_, let progress):
-                        await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
-                    case .failed(_, let error):
-                        cont.resume(throwing: error)
-                    case .paused(_):
-                        await self.updateModelState(.paused)
-                    case .finished(_):
-                        Self.LOG.info("Download finished: \(statusUpdate)")
-                        cont.resume()
-                    default:
-                        Self.LOG.info("Unknown status update: \(statusUpdate)")
-                    }
-                }
+        let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
+        dloop: for try await statusUpdate in statusUpdates {
+            switch statusUpdate {
+            case .began(_):
+                self.updateModelState(.downloading(fraction: 0))
+            case .downloading(_, let progress):
+                self.updateModelState(.downloading(fraction: progress.fractionCompleted))
+            case .failed(_, let error):
+                 throw error
+            case .paused(_):
+                self.updateModelState(.paused)
+            case .finished(_):
+                Self.LOG.info("Download finished: \(statusUpdate)")
+                break dloop
+            default:
+                Self.LOG.info("Unknown status update: \(statusUpdate)")
             }
         }
         
