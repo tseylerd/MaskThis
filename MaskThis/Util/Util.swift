@@ -1,4 +1,5 @@
 import Foundation
+import Atomics
 
 nonisolated struct Util {
     private init() { }
@@ -17,12 +18,24 @@ nonisolated struct Util {
 }
 
 extension Task where Success == Never, Failure == Never {
-    static func withTimeout<T>(
+    static func withTimeout<T: Sendable>(
         duration: Duration,
         operation: @escaping @Sendable () async throws -> T
     ) async throws -> T? {
-        let mainTask: Task<T, Error> = Task<T, Error>.detached {
+        return try await withConditionalTimeout(duration: duration) { _ in
             try await operation()
+        }
+    }
+
+    static func withConditionalTimeout<T: Sendable>(
+        duration: Duration,
+        operation: @escaping @Sendable (@Sendable () -> Void) async throws -> T
+    ) async throws -> T? {
+        let timeout = ManagedAtomic(true)
+        let mainTask: Task<T, Error> = Task<T, Error>.detached {
+            try await operation {
+                timeout.store(false, ordering: .sequentiallyConsistent)
+            }
         }
         
         return try await withThrowingTaskGroup(of: T.self) { group in
@@ -31,7 +44,11 @@ extension Task where Success == Never, Failure == Never {
             }
             group.addTask {
                 try await Task.sleep(for: duration)
-                throw TimeoutError()
+                if timeout.load(ordering: .sequentiallyConsistent) {
+                    throw TimeoutError()
+                } else {
+                    return try await mainTask.value
+                }
             }
             
             do {

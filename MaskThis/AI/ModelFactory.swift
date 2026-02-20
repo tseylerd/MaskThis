@@ -43,26 +43,67 @@ open class BGAssetsBasedFactory: ModelFactory {
         
         let adapter = try SystemLanguageModel.Adapter(name: name)
         
-        let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
-        dloop: for try await statusUpdate in statusUpdates {
-            switch statusUpdate {
-            case .began(_):
-                self.updateModelState(.downloading(fraction: 0))
-            case .downloading(_, let progress):
-                self.updateModelState(.downloading(fraction: progress.fractionCompleted))
-            case .failed(_, let error):
-                 throw error
-            case .paused(_):
-                self.updateModelState(.paused)
-            case .finished(_):
-                Self.LOG.info("Download finished: \(statusUpdate)")
-                break dloop
-            default:
-                Self.LOG.info("Unknown status update: \(statusUpdate)")
+        let statuses = try await AssetPackManager.shared.status(ofAssetPackWithID: assetPackId)
+        let downloaded = check(statuses: statuses, is: .downloaded)
+        let downloading = check(statuses: statuses, is: .downloading)
+        if downloaded && !downloading {
+            return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
+        }
+        
+        do {
+            try await Task.withConditionalTimeout(duration: .seconds(10)) { stopTimeout in
+                let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
+                for try await statusUpdate in statusUpdates {
+                    switch statusUpdate {
+                    case .began(_):
+                        stopTimeout()
+                        await self.updateModelState(.downloading(fraction: 0))
+                    case .downloading(_, let progress):
+                        stopTimeout()
+                        await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
+                    case .failed(_, let error):
+                        stopTimeout()
+                        throw error
+                    case .paused(_):
+                        stopTimeout()
+                        await self.updateModelState(.paused)
+                    case .finished(_):
+                        stopTimeout()
+                        Self.LOG.info("Download finished")
+                        return
+                    default:
+                        stopTimeout()
+                        Self.LOG.info("Unknown status update: \(statusUpdate.description)")
+                    }
+                }
+            }
+        } catch _ as TimeoutError {
+            let downloaded = try await checkStatus(forId: assetPackId, is: .downloaded)
+            if !downloaded {
+                throw ModelInitializationError.noCompatibleModels
             }
         }
         
         return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
+    }
+    
+    private nonisolated func checkStatus(forId id: String, is status: AssetPack.Status) async throws -> Bool {
+        let statuses = try await AssetPackManager.shared.status(ofAssetPackWithID: id)
+        return check(statuses: statuses, is: status)
+    }
+    
+    private nonisolated func check(statuses: AssetPack.Status, is status: AssetPack.Status) -> Bool {
+        Self.LOG.info("Checking status for \(status.rawValue)")
+        
+        Self.LOG.info("Current status is downloaded \(statuses.contains(.downloaded))")
+        Self.LOG.info("Current status is downloadAvailable \(statuses.contains(.downloadAvailable))")
+        Self.LOG.info("Current status is updateAvailable \(statuses.contains(.updateAvailable))")
+        Self.LOG.info("Current status is upToDate \(statuses.contains(.upToDate))")
+        Self.LOG.info("Current status is outOfDate \(statuses.contains(.outOfDate))")
+        Self.LOG.info("Current status is obsolete \(statuses.contains(.obsolete))")
+        Self.LOG.info("Current status is downloading \(statuses.contains(.downloading))")
+
+        return statuses.contains(status)
     }
     
     private func updateModelState(_ state: ModelState) {

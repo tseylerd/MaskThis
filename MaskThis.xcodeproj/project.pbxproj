@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2863B0522F47D0D500C43927 /* MaskThisDownloader.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 2863B04A2F47D0D500C43927 /* MaskThisDownloader.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		28CBDD962F48E86300B48047 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 28CBDD952F48E86300B48047 /* Atomics */; };
 		28CE50A12F3FF14200E78D79 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 28CE50A02F3FF14200E78D79 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -102,6 +103,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28CE50A12F3FF14200E78D79 /* KeyboardShortcuts in Frameworks */,
+				28CBDD962F48E86300B48047 /* Atomics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,6 +182,7 @@
 			name = MaskThis;
 			packageProductDependencies = (
 				28CE50A02F3FF14200E78D79 /* KeyboardShortcuts */,
+				28CBDD952F48E86300B48047 /* Atomics */,
 			);
 			productName = MaskThis;
 			productReference = 286E731E2EE722BE00E7EA54 /* MaskThis.app */;
@@ -241,6 +244,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				28CE509F2F3FF14200E78D79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				28CBDD942F48E86300B48047 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 286E731F2EE722BE00E7EA54 /* Products */;
@@ -511,7 +515,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = LZ7PH84ZFG;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -559,7 +563,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = LZ7PH84ZFG;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -680,6 +684,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		28CBDD942F48E86300B48047 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-atomics.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
 		28CE509F2F3FF14200E78D79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
@@ -691,6 +703,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		28CBDD952F48E86300B48047 /* Atomics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28CBDD942F48E86300B48047 /* XCRemoteSwiftPackageReference "swift-atomics" */;
+			productName = Atomics;
+		};
 		28CE50A02F3FF14200E78D79 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 28CE509F2F3FF14200E78D79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
