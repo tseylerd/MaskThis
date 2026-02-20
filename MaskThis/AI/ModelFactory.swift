@@ -56,15 +56,19 @@ open class BGAssetsBasedFactory: ModelFactory {
                 for try await statusUpdate in statusUpdates {
                     switch statusUpdate {
                     case .began(_):
+                        Self.LOG.info("Began")
                         stopTimeout()
                         await self.updateModelState(.downloading(fraction: 0))
                     case .downloading(_, let progress):
+                        Self.LOG.info("Received progress")
                         stopTimeout()
                         await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
                     case .failed(_, let error):
+                        Self.LOG.info("Failed to install")
                         stopTimeout()
                         throw error
                     case .paused(_):
+                        Self.LOG.info("Paused")
                         await self.updateModelState(.paused)
                     case .finished(_):
                         stopTimeout()
