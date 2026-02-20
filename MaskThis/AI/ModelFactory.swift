@@ -49,45 +49,40 @@ open class BGAssetsBasedFactory: ModelFactory {
         if downloaded && !downloading {
             return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
         }
+
+        let pack = try await AssetPackManager.shared.assetPack(withID: assetPackId)
+        launchProgressUpdates(assetPackId)
         
-        do {
-            try await Task.withConditionalTimeout(duration: .seconds(10)) { stopTimeout in
-                let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
-                for try await statusUpdate in statusUpdates {
-                    switch statusUpdate {
-                    case .began(_):
-                        Self.LOG.info("Began")
-                        stopTimeout()
-                        await self.updateModelState(.downloading(fraction: 0))
-                    case .downloading(_, let progress):
-                        Self.LOG.info("Received progress")
-                        stopTimeout()
-                        await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
-                    case .failed(_, let error):
-                        Self.LOG.info("Failed to install")
-                        stopTimeout()
-                        throw error
-                    case .paused(_):
-                        Self.LOG.info("Paused")
-                        await self.updateModelState(.paused)
-                    case .finished(_):
-                        stopTimeout()
-                        Self.LOG.info("Download finished")
-                        return
-                    default:
-                        stopTimeout()
-                        Self.LOG.info("Unknown status update: \(statusUpdate.description)")
-                    }
-                }
-            }
-        } catch _ as TimeoutError {
-            let downloaded = try await checkStatus(forId: assetPackId, is: .downloaded)
-            if !downloaded {
-                throw ModelInitializationError.noCompatibleModels
-            }
-        }
+        try await AssetPackManager.shared.ensureLocalAvailability(of: pack)
         
         return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
+    }
+    
+    private nonisolated func launchProgressUpdates(_ assetPackId: String) {
+        Task.detached(priority: .high) {
+            let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
+            for try await statusUpdate in statusUpdates {
+                switch statusUpdate {
+                case .began(_):
+                    Self.LOG.info("Began")
+                    await self.updateModelState(.downloading(fraction: 0))
+                case .downloading(_, let progress):
+                    Self.LOG.info("Received progress")
+                    await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
+                case .failed(_, let error):
+                    Self.LOG.info("Failed to install")
+                    throw error
+                case .paused(_):
+                    Self.LOG.info("Paused")
+                    await self.updateModelState(.paused)
+                case .finished(_):
+                    Self.LOG.info("Download finished")
+                    return
+                default:
+                    Self.LOG.info("Unknown status update: \(statusUpdate.description)")
+                }
+            }
+        }
     }
     
     private nonisolated func checkStatus(forId id: String, is status: AssetPack.Status) async throws -> Bool {
