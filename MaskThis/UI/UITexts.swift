@@ -108,6 +108,7 @@ nonisolated struct UITexts {
             
             static let lastError = "Last error"
             static let installationFailed = "Model installation failed"
+            static let noCompatibleModels = "Model assets are missing"
             
             static let tooBigText = "Text is too big"
             static let timeoutWhileMasking = "Timeout"

@@ -22,58 +22,51 @@ open class BGAssetsBasedFactory: ModelFactory {
     fileprivate static nonisolated let LOG = Logger(subsystem: Subsystems.AI, category: "BGAssetsFactory")
     
     private let appModel: AppModel
-    private let assetsId: String
-    private let path: String
+    private let name: String
     
-    private var progressTask: Task<Void, Never>? = nil
-    
-    init(appModel: AppModel, path: String, assets: String) {
+    init(appModel: AppModel, name: String) {
         self.appModel = appModel
-        self.path = path
-        self.assetsId = assets
+        self.name = name
     }
     
     func create() async throws -> SystemLanguageModel {
         Self.LOG.info("Creating system model instance")
-
-        let assetPack = try await AssetPackManager.shared.assetPack(withID: assetsId)
         
-        runProgressTask()
+        try SystemLanguageModel.Adapter.removeObsoleteAdapters()
+        let ids = SystemLanguageModel.Adapter.compatibleAdapterIdentifiers(
+             name: name
+        )
         
-        try await AssetPackManager.shared.ensureLocalAvailability(of: assetPack)
+        guard let assetPackId = ids.first else {
+            throw ModelInitializationError.noCompatibleModels
+        }
         
-        progressTask = nil
+        let adapter = try SystemLanguageModel.Adapter(name: name)
         
-        let adapterUrl = try await Task.detached(priority: .high) {
-            try AssetPackManager.shared.url(for: .init(self.path))
-        }.value
-        
-        let model = try createModel(adapterUrl)
-        return model
-    }
-    
-    open func createModel(_ url: URL) throws -> SystemLanguageModel {
-        try SystemLanguageModel(adapter: .init(fileURL: url), guardrails: .permissiveContentTransformations)
-    }
-    
-    private func runProgressTask() {
-        progressTask = Task.detached(priority: .background) {
-            let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: self.assetsId)
-            for await statusUpdate in statusUpdates {
-                switch statusUpdate {
-                case .began(_):
-                    await self.updateModelState(.downloading(fraction: 0))
-                case .downloading(_, let progress):
-                    await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
-                case .failed(_, let error):
-                    await self.updateModelState(.error(text: error.localizedDescription))
-                case .paused(_):
-                    await self.updateModelState(.paused)
-                default:
-                    Self.LOG.info("Unknown status update: \(statusUpdate)")
+        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, any Error>) in
+            Task.detached(priority: .high) {
+                let statusUpdates = AssetPackManager.shared.statusUpdates(forAssetPackWithID: assetPackId)
+                for try await statusUpdate in statusUpdates {
+                    switch statusUpdate {
+                    case .began(_):
+                        await self.updateModelState(.downloading(fraction: 0))
+                    case .downloading(_, let progress):
+                        await self.updateModelState(.downloading(fraction: progress.fractionCompleted))
+                    case .failed(_, let error):
+                        cont.resume(throwing: error)
+                    case .paused(_):
+                        await self.updateModelState(.paused)
+                    case .finished(_):
+                        Self.LOG.info("Download finished: \(statusUpdate)")
+                        cont.resume()
+                    default:
+                        Self.LOG.info("Unknown status update: \(statusUpdate)")
+                    }
                 }
             }
         }
+        
+        return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
     }
     
     private func updateModelState(_ state: ModelState) {
@@ -84,20 +77,17 @@ open class BGAssetsBasedFactory: ModelFactory {
 @MainActor
 class BGAssetsFactory: BGAssetsBasedFactory {
     init(appModel: AppModel) {
-        super.init(appModel: appModel, path: "mask_adapter.fmadapter", assets: "MaskThisModelAdapter262")
+        super.init(appModel: appModel, name: "m-adapter")
     }
 }
 
-@MainActor
-class TestFactory: BGAssetsBasedFactory {
-    init(appModel: AppModel) {
-        super.init(appModel: appModel, path: "TestFolder/test.txt", assets: "MaskThisTestAssets")
-    }
+enum ModelInitializationError: LocalizedError {
+    case noCompatibleModels
     
-    override func createModel(_ url: URL) throws -> SystemLanguageModel {
-        let content = try String(contentsOf: url, encoding: .utf8)
-        Self.LOG.error("Assets content is: \(content)")
-        
-        return SystemLanguageModel.default
+    var errorDescription: String? {
+        switch self {
+        case .noCompatibleModels:
+            UITexts.Statuses.Errors.noCompatibleModels
+        }
     }
 }
