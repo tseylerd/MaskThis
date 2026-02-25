@@ -19,6 +19,8 @@ class LocalModelAdapterFactory: ModelFactory {
 
 @MainActor
 open class BGAssetsBasedFactory: ModelFactory {
+    private static nonisolated let EXTENSION = "fmadapter"
+    
     fileprivate static nonisolated let LOG = Logger(subsystem: Subsystems.AI, category: "BGAssetsFactory")
     
     private let appModel: AppModel
@@ -33,29 +35,61 @@ open class BGAssetsBasedFactory: ModelFactory {
         Self.LOG.info("Creating system model instance")
         
         try SystemLanguageModel.Adapter.removeObsoleteAdapters()
+        Self.LOG.info("Removed obsolete adapters")
+
         let ids = SystemLanguageModel.Adapter.compatibleAdapterIdentifiers(
              name: name
         )
-        
+        Self.LOG.info("Received compatible ids: \(ids.count)")
+
         guard let assetPackId = ids.first else {
             throw ModelInitializationError.noCompatibleModels
         }
         
-        let adapter = try SystemLanguageModel.Adapter(name: name)
+        Self.LOG.info("Resolving URL")
+        let url = try await resolveURL(assetPackId)
         
-        let statuses = try await AssetPackManager.shared.status(ofAssetPackWithID: assetPackId)
-        let downloaded = check(statuses: statuses, is: .downloaded)
-        let downloading = check(statuses: statuses, is: .downloading)
-        if downloaded && !downloading {
-            return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
-        }
-
-        let pack = try await AssetPackManager.shared.assetPack(withID: assetPackId)
-        launchProgressUpdates(assetPackId)
+        Self.LOG.info("Constructing adapter")
+        let adapter = try SystemLanguageModel.Adapter(fileURL: url)
         
-        try await AssetPackManager.shared.ensureLocalAvailability(of: pack)
-        
+        Self.LOG.info("Constructing model")
         return SystemLanguageModel(adapter: adapter, guardrails: .permissiveContentTransformations)
+    }
+    
+    private func resolveURL(_ assetPackId: String) async throws -> URL {
+        do {
+            return try await resolveBGAssetsAdapter(assetPackId)
+        } catch {
+            Self.LOG.error("Failed to resolve URL using AssetPackManager api: \(error.localizedDescription)")
+            return try resolveLocalAdapter(assetPackId)
+        }
+    }
+    
+    private func resolveBGAssetsAdapter(_ assetPackId: String) async throws -> URL {
+        Self.LOG.info("Trying to get adapter via background assets")
+        let assetPack = try await AssetPackManager.shared.assetPack(withID: assetPackId)
+        Self.LOG.info("Got asset pack with id: \(assetPack.id)")
+        launchProgressUpdates(assetPackId)
+
+        Self.LOG.info("Ensuring local availability")
+        try await AssetPackManager.shared.ensureLocalAvailability(of: assetPack)
+        
+        Self.LOG.info("Getting url")
+        let adapterUrl = try await Task.detached(priority: .high) {
+            try AssetPackManager.shared.url(for: .init("\(assetPackId).\(Self.EXTENSION)"))
+        }.value
+        return adapterUrl
+    }
+    
+    private func resolveLocalAdapter(_ assetPackId: String) throws -> URL {
+        Self.LOG.info("Trying to get adapter via bundled")
+        let url = Bundle.main.url(forResource: assetPackId, withExtension: Self.EXTENSION)
+        guard let url else {
+            throw ModelInitializationError.noCompatibleModels
+        }
+        Self.LOG.info("Have adapter in bundle")
+       
+        return url
     }
     
     private nonisolated func launchProgressUpdates(_ assetPackId: String) {
@@ -84,26 +118,7 @@ open class BGAssetsBasedFactory: ModelFactory {
             }
         }
     }
-    
-    private nonisolated func checkStatus(forId id: String, is status: AssetPack.Status) async throws -> Bool {
-        let statuses = try await AssetPackManager.shared.status(ofAssetPackWithID: id)
-        return check(statuses: statuses, is: status)
-    }
-    
-    private nonisolated func check(statuses: AssetPack.Status, is status: AssetPack.Status) -> Bool {
-        Self.LOG.info("Checking status for \(status.rawValue)")
-        
-        Self.LOG.info("Current status is downloaded \(statuses.contains(.downloaded))")
-        Self.LOG.info("Current status is downloadAvailable \(statuses.contains(.downloadAvailable))")
-        Self.LOG.info("Current status is updateAvailable \(statuses.contains(.updateAvailable))")
-        Self.LOG.info("Current status is upToDate \(statuses.contains(.upToDate))")
-        Self.LOG.info("Current status is outOfDate \(statuses.contains(.outOfDate))")
-        Self.LOG.info("Current status is obsolete \(statuses.contains(.obsolete))")
-        Self.LOG.info("Current status is downloading \(statuses.contains(.downloading))")
 
-        return statuses.contains(status)
-    }
-    
     private func updateModelState(_ state: ModelState) {
         appModel.modelState = state
     }
