@@ -1,5 +1,6 @@
 import Foundation
 import Atomics
+import FoundationModels
 
 nonisolated struct Util {
     private init() { }
@@ -8,8 +9,10 @@ nonisolated struct Util {
         try? await Task.sleep(for: duration)
     }
     
-    static func adapterUrl() -> URL {
-        return Bundle.main.url(forResource: "mask_adapter", withExtension: "fmadapter")!
+    static func compatibleAdapterIdentifier(_ name: String) -> String? {
+        return SystemLanguageModel.Adapter.compatibleAdapterIdentifiers(
+             name: name
+        ).first
     }
     
     static func tokensToSymbols(_ tokens: Int) -> Int {

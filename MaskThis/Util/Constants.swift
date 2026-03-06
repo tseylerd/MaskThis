@@ -6,4 +6,6 @@ struct Constants {
         
         static let howToUse = "how.to.use"
     }
+    
+    static let adapterName = "m-adapter"
 }

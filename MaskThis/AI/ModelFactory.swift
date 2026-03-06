@@ -37,15 +37,12 @@ open class BGAssetsBasedFactory: ModelFactory {
         try SystemLanguageModel.Adapter.removeObsoleteAdapters()
         Self.LOG.info("Removed obsolete adapters")
 
-        let ids = SystemLanguageModel.Adapter.compatibleAdapterIdentifiers(
-             name: name
-        )
-        Self.LOG.info("Received compatible ids: \(ids.count)")
-
-        guard let assetPackId = ids.first else {
+        guard let assetPackId = Util.compatibleAdapterIdentifier(name) else {
+            Self.LOG.info("Compatible adapter id is nil")
             throw ModelInitializationError.noCompatibleModels
         }
         
+        Self.LOG.info("Received compatible id: \(assetPackId)")
         Self.LOG.info("Resolving URL")
         let url = try await resolveURL(assetPackId)
         
@@ -127,7 +124,7 @@ open class BGAssetsBasedFactory: ModelFactory {
 @MainActor
 class BGAssetsFactory: BGAssetsBasedFactory {
     init(appModel: AppModel) {
-        super.init(appModel: appModel, name: "m-adapter")
+        super.init(appModel: appModel, name: Constants.adapterName)
     }
 }
 
