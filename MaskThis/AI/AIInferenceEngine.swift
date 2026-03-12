@@ -3,15 +3,20 @@ import Foundation
 
 actor AIInferenceEngine {
     static nonisolated let MAX_LENGTH = Util.tokensToSymbols(2048)
+    static nonisolated let MAX_CHUNKS = 4
+    static nonisolated let CHUNK_SIZE = Util.tokensToSymbols(MAX_TOKENS)
+    static nonisolated let SENTENCE_SEPARATORS: [Character] = [".", ";", "?", "!"]
     
     private static let MAX_TOKENS = 512
     private static let MAX_OUTPUT_TOKENS = 768
     
+    private let maxChunkLength: Int
     private let model: SystemLanguageModel
     private let preprocessor: TextProcessor
     private let postProcessor: TextProcessor
     
-    init(_ model: SystemLanguageModel) async {
+    init(_ model: SystemLanguageModel, _ maxChunkLength: Int = CHUNK_SIZE) async {
+        self.maxChunkLength = maxChunkLength
         self.model = model
         self.preprocessor = await InputPreprocessor()
         self.postProcessor = await OutputProcessor()
@@ -23,11 +28,13 @@ actor AIInferenceEngine {
         }
         
         try Task.checkCancellation()
-
-        let maxSymbols = Util.tokensToSymbols(Self.MAX_TOKENS)
+        
+        let chunks = Chunker.chunks(from: text, by: Self.SENTENCE_SEPARATORS, withMaxSybolsOf: maxChunkLength)
+        guard chunks.count <= Self.MAX_CHUNKS else {
+            throw InferenceError.textIsTooBig
+        }
         
         var result = ""
-        let chunks = split(text, maxSymbols)
         for chunk in chunks {
             let session = LanguageModelSession(model: model)
             try Task.checkCancellation()

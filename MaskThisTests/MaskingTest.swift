@@ -127,8 +127,17 @@ Thanks.
         log(result)
     }
     
-    private func process(_ text: String) async throws -> String {
-        let engine = await AIInferenceEngine(model)
+    @Test func tooManyChunksThrown() async throws {
+        let code = """
+    !?.!?.!?.!?.
+    """
+        await #expect(throws: InferenceError.textIsTooBig) {
+            try await process(code, 1)
+        }
+    }
+    
+    private func process(_ text: String, _ maxChunkLength: Int = AIInferenceEngine.CHUNK_SIZE) async throws -> String {
+        let engine = await AIInferenceEngine(model, maxChunkLength)
         return try await engine.mask(text)
     }
     
