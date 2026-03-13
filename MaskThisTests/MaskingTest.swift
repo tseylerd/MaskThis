@@ -136,6 +136,45 @@ Thanks.
         }
     }
     
+    @Test func spacesArePreserved() async throws {
+        let code = """
+    
+    
+       My name is Dima. My phone is +1 234 56789123
+    
+    
+    """
+        let result = try await process(code)
+        
+        #expect(result.hasPrefix("\n\n   My name is "))
+        #expect(result.hasSuffix("\n\n"))
+    }
+    
+    @Test func emptyStringsAreProcessedCorrectly() async throws {
+        let code = """
+                
+    """
+        let result = try await process(code, 3)
+        
+        #expect(result == code)
+    }
+    
+    @Test func singleEmptyStringIsProcessedCorrectly() async throws {
+        let code = """
+                
+    """
+        let result = try await process(code)
+        
+        #expect(result == code)
+    }
+    
+    @Test func emptyStringIsEmpty() async throws {
+        let code = ""
+        let result = try await process(code)
+        
+        #expect(result == code)
+    }
+    
     private func process(_ text: String, _ maxChunkLength: Int = AIInferenceEngine.CHUNK_SIZE) async throws -> String {
         let engine = await AIInferenceEngine(model, maxChunkLength)
         return try await engine.mask(text)

@@ -20,6 +20,44 @@ nonisolated struct Util {
     }
 }
 
+nonisolated extension StringProtocol {
+    var isEmptyOrSpaces: Bool {
+        trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    func startOfMeaningfulContent() -> String.Index? {
+        var index = startIndex
+        guard index < endIndex else {
+            return nil
+        }
+        
+        while index < endIndex && (self[index].isWhitespace || self[index].isNewline) {
+            index = self.index(after: index)
+        }
+        
+        return index < endIndex ? index : nil
+    }
+    
+    func endOfMeaningfulContent() -> String.Index? {
+        let endIndex = self.endIndex
+        guard endIndex > startIndex else {
+            return nil
+        }
+        
+        var currentIndex = endIndex
+        while currentIndex > startIndex {
+            let nextIndex = self.index(before: currentIndex)
+            let char = self[nextIndex]
+            guard char.isNewline || char.isWhitespace else {
+                break
+            }
+            currentIndex = nextIndex
+        }
+        
+        return currentIndex
+    }
+}
+
 extension Task where Success == Never, Failure == Never {
     static func withTimeout<T: Sendable>(
         duration: Duration,
