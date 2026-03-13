@@ -17,6 +17,8 @@ struct MaskingTest {
     @Test
     func simpleNoPII() async throws {
         let result = try await process("Name")
+        #expect(result == "Name")
+        
         Self.LOG.info("\(result)")
     }
     
